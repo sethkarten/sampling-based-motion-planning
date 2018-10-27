@@ -3,17 +3,21 @@
 //
 #ifndef SAMPLING_QUATERNION_H
 #define SAMPLING_QUATERNION_H
+#include <PQP.h>
+#include <unordered_set>
 class Quaternion {
 public:
     double W, X, Y, Z;
     Quaternion(double w, double x, double y, double z);
-    double distance(Quaternion a, Quaternion b);
-    bool interpolate(Quaternion a, Quaternion b);
-    PQP_REAL to_rotation_matrix(Quaternion a);
-    Quaternion uniform_sample(int max);
+    Quaternion();
+    double distance(const Quaternion& b) const;
+    Quaternion interpolate(const Quaternion& b,double f) const;
+    PQP_REAL** to_rotation_matrix();
+    bool operator=(const Quaternion& q) const;
+    static Quaternion uniform_sample(int max);
 private:
-    double operator*(Quaternion a, Quaternion b);
-    Quaternion normalize(Quaternion a);
-    double magnitude(Quaternion a);
-}
+    double operator*(const Quaternion& b)const;
+    Quaternion normalize() const;
+    double magnitude()const;
+};
 #endif //SAMPLING_QUATERNION_H

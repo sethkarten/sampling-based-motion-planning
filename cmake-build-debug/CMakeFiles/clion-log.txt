@@ -1,4 +1,4 @@
-/home/sg/Downloads/clion-2018.2.5/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/sg/CLionProjects/sampling-based-motion-planning
+/home/sg/Downloads/clion-2018.2.5/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/sg/catkin_ws/src/sampling
 -- The C compiler identification is GNU 5.4.0
 -- The CXX compiler identification is GNU 5.4.0
 -- Check for working C compiler: /usr/bin/cc
@@ -31,4 +31,4 @@ CMake Error at CMakeLists.txt:10 (find_package):
 
 
 -- Configuring incomplete, errors occurred!
-See also "/home/sg/CLionProjects/sampling-based-motion-planning/cmake-build-debug/CMakeFiles/CMakeOutput.log".
+See also "/home/sg/catkin_ws/src/sampling/cmake-build-debug/CMakeFiles/CMakeOutput.log".

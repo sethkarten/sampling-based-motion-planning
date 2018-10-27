@@ -10,7 +10,7 @@
 * 
 */
 
-#include "gnn.hpp"
+#include <gnn.hpp>
 
 #include <cassert>
 #include <limits>
@@ -210,20 +210,7 @@ namespace gnn
             return 0;
         }
 
-        if(k > MAX_KK)
-        {
-            k = MAX_KK;
-        }
-        else if( k >= nr_nodes )
-        {
-            for( int i=0; i<nr_nodes; i++ )
-            {
-                close_nodes[i] = nodes[i];
-                distances[i] = distance_function(nodes[i],state );
-            }        
-            sort_proximity_nodes( close_nodes, distances, 0, nr_nodes-1 );
-            return nr_nodes;
-        }
+
 
         clear_added();
 

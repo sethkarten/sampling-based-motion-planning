@@ -3,9 +3,17 @@
 //
 
 #include "../include/graphs.hpp"
-#include "../include/graphs.hpp"
 
 using namespace graphs;
+namespace std{
+    template<class T>
+    class hash<Node<T>>{
+    public:
+        size_t operator()(const Node<T>& n) const{
+            return std::hash<T>()(n.storedData);
+        };
+    };
+}
 template <class T>
 void Node<T>::addNeighbor(graphs::Node<T> &n, double cost) {
     this->neighbors.push_back(std::make_pair(n,cost));
@@ -14,22 +22,23 @@ void Node<T>::addNeighbor(graphs::Node<T> &n, double cost) {
 
 template <class T>
 Node<T>::Node(T& data) {
-    this->storedData = data;
+    this.storedData = data;
     this.g = 0;
     this.h = 0;
 }
 
 template <class T>
-Graph<T>::Graph(){
-    this->vertices.clear();
-}
-template <class T>
 void Graph<T>::addVertex(T &data) {
-    Node<T>& n = new Node<T>(data);
+    Node<T>& n = *(new Node<T>(data));
+
     this->vertices.insert(n);
+    this->add_node(n);
 }
 template <class T>
 bool Node<T>::operator<(const Node<T> &n) {
     return this.g + this.h < n.g + n.h;
 }
-
+template <class T>
+bool Node<T>::operator=(const Node<T> &n) {
+    return n.storedData == this->storedData;
+}
