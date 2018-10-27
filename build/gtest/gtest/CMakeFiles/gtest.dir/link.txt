@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC   -shared -Wl,-soname,libgtest.so -o libgtest.so CMakeFiles/gtest.dir/src/gtest-all.cc.o  -L/home/sg/CLionProjects/sampling-based-motion-planning/build/gtest/gtest/src -lpthread -Wl,-rpath,/home/sg/CLionProjects/sampling-based-motion-planning/build/gtest/gtest/src 
