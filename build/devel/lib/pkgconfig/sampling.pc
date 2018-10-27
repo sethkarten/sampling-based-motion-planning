@@ -1,8 +1,0 @@
-prefix=/home/sg/CLionProjects/sampling-based-motion-planning/build/devel
-
-Name: sampling
-Description: Description of sampling
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/sg/CLionProjects/sampling-based-motion-planning/build/devel/lib 
-Requires: 

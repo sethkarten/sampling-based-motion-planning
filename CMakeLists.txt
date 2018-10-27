@@ -112,14 +112,16 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
-# ${catkin_INCLUDE_DIRS}
+    include
+    nearest_neighbors/include
+    PQP/include
+    ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/sampling.cpp
-# )
+#add_library(${PROJECT_NAME}
+#   src/${PROJECT_NAME}/nearest_neighbors
+#)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
