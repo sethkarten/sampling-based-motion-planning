@@ -5,7 +5,7 @@
 #ifndef SAMPLING_GRAPH_H
 #define SAMPLING_GRAPH_H
 
-#include "gnn.hpp"
+#include <gnn.hpp>
 using namespace gnn;
 namespace graphs {
     template <class T>
@@ -23,7 +23,8 @@ namespace graphs {
     public:
         std::unordered_set<Node<T>&> vertices;
         Graph();
-        
+        void addVertex(T& data);
+
     };
 };
 

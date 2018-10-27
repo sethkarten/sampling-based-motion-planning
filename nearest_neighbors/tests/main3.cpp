@@ -1,8 +1,10 @@
 
-#include "gnn.hpp"
-#include "graphs.hpp"
+#include <gnn.hpp>
+#include <graphs.hpp>
 #include <iostream>
 #include <vector>
+#include "../include/graphs.hpp"
+#include "../include/Quaternion.hpp"
 
 class state_node_t : public gnn::proximity_node_t
 {
@@ -46,43 +48,11 @@ void print_node(gnn::proximity_node_t* node)
 	}
 	std::cout<<n->state[n->d-1]<<std::endl;
 }
-
+using namespace graphs;
 int main(int argc, char* argv[])
 {
-	int dimension = 2;
-	gnn::graph_nearest_neighbors_t* g;
-	g = new gnn::graph_nearest_neighbors_t(std::bind(&distance,std::placeholders::_1,std::placeholders::_2));
+	Graph<Quaternion> graph = new Graph<Quaternion>();
 
-	std::vector<state_node_t*> all_nodes;
-	state_node_t* query_node = new state_node_t(dimension);
-	for(int i=0;i<10000;++i)
-	{
-		auto new_node = new state_node_t(dimension);
-		for(int j=0;j<dimension;++j)
-		{
-			//create a random point between -100,100
-			new_node->state[j] = uniform_random()*200-100;
-		}
-		g->add_node(new_node);
-		all_nodes.push_back(new_node);
-	}
-	for(int j=0;j<dimension;++j)
-	{
-		//create a random point between -100,100
-		query_node->state[j] = uniform_random()*200-100;
-	}
-
-	double dist;
-	std::cout<<"Query Node: ";
-	print_node(query_node);
-	std::cout<<"Closest Node: ";
-	print_node(g->find_closest(query_node,&dist));
-
-	for(int i=0;i<10000;++i)
-	{
-		g->remove_node(all_nodes[i]);
-	}
-	delete query_node;
 
 	return 0;
 }
