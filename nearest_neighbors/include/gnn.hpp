@@ -12,7 +12,7 @@
 
 #include <functional>
 #include <cmath>
-
+#include <bits/stdc++.h>
 #ifndef GNN_NEAREST_NEIGHBOR_HPP
 #define GNN_NEAREST_NEIGHBOR_HPP
 
