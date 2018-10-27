@@ -1,10 +1,10 @@
 
 #include <gnn.hpp>
-#include <graphs.hpp>
+#include "../../include/graphs.hpp"
 #include <iostream>
 #include <vector>
-#include "../include/graphs.hpp"
-#include "../include/Quaternion.hpp"
+#include "../../include/graphs.hpp"
+#include "../../include/Quaternion.hpp"
 
 class state_node_t : public gnn::proximity_node_t
 {
