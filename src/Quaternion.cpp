@@ -26,12 +26,11 @@ Quaternion::Quaternion() {
     Z = 0;
 }
 double Quaternion::distance(const Quaternion& b) const {
-    const Quaternion c = b.normalize();
-    double lambda = normalize() * c;
+    double lambda = normalize() * b.normalize();
     return 1 - fabs(lambda);
 }
 bool Quaternion::operator==(const Quaternion &q) const {
-    return distance(q) <= .001;
+    return distance(q) <= .00001;
 }
 Quaternion Quaternion::interpolate(const Quaternion& b,double f) const{
     // slerp (spherical linear interpolation)
@@ -76,13 +75,13 @@ PQP_REAL** Quaternion::to_rotation_matrix() {
     r_m[2][2] = W * W - X * X - Y * Y + Z * Z;
     return r_m;
 }
-Quaternion Quaternion::uniform_sample(int max) {
-    srand(max);
-    double s = rand();
+Quaternion Quaternion::uniform_sample(double a, double b, double c) {
+    rand();
+    double s = a;
     double sigma1 = sqrt(1 - s);
     double sigma2 = sqrt(s);
-    double theta1 = 2 * M_PI * rand();
-    double theta2 = 2 * M_PI * rand();
+    double theta1 = 2 * M_PI * b;
+    double theta2 = 2 * M_PI * c;
     double w = cos(theta2) * sigma2;
     double x = sin(theta1) * sigma1;
     double y = cos(theta1) * sigma1;
@@ -93,7 +92,7 @@ double Quaternion::operator * (const Quaternion& b)const {
     return W * b.W + X * b.X + Y * b.Y + Z * b.Z;
 }
 Quaternion Quaternion::normalize() const{
-    double mag = sqrt(this->magnitude());   // Magnitude
+    double mag = magnitude();   // Magnitude
     Quaternion tmp;
     tmp.W = W/mag;
     tmp.X = X/mag;
@@ -102,5 +101,5 @@ Quaternion Quaternion::normalize() const{
     return tmp;
 }
 double Quaternion::magnitude() const {
-    return X * X + Y * Y + Z * Z;
+    return sqrt((*this)*(*this));
 }

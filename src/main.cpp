@@ -1,4 +1,4 @@
-
+#include <random>
 #include "../nearest_neighbors/include/gnn.hpp"
 #include "../include/graphs.hpp"
 #include <iostream>
@@ -28,25 +28,40 @@ void print_node(Node<Quaternion>* n)
 {
 	cout<<n->storedData.W<<" "<<n->storedData.X<<" "<<n->storedData.Y<<" "<<n->storedData.Z<<"\n";
 }
+unsigned long mix(unsigned long a, unsigned long b, unsigned long c)
+{
+	a=a-b;  a=a-c;  a=a^(c >> 13);
+	b=b-c;  b=b-a;  b=b^(a << 8);
+	c=c-a;  c=c-b;  c=c^(b >> 13);
+	a=a-b;  a=a-c;  a=a^(c >> 12);
+	b=b-c;  b=b-a;  b=b^(a << 16);
+	c=c-a;  c=c-b;  c=c^(b >> 5);
+	a=a-b;  a=a-c;  a=a^(c >> 3);
+	b=b-c;  b=b-a;  b=b^(a << 10);
+	c=c-a;  c=c-b;  c=c^(b >> 15);
+	return c;
+}
 int main(int argc, char* argv[])
 {
+	std::minstd_rand0 generator;
+	generator.seed(time(NULL));
+	std::uniform_real_distribution<double> distribution(0.0,1.0);
 	Graph<Quaternion>* graph = new Graph<Quaternion>(std::bind(&distanceQa,std::placeholders::_1,std::placeholders::_2));
 	std::vector<Node<Quaternion>*> all_nodes;
-	for (int i = 0 ; i < 2; i++){
-		Quaternion newQ = Quaternion::uniform_sample(100);
+	Node<Quaternion>* testN = new Node<Quaternion>(Quaternion::uniform_sample(distribution(generator),distribution(generator),distribution(generator)));
+	for (int i = 0 ; i < 100; i++){
+		Quaternion newQ = Quaternion::uniform_sample(distribution(generator),distribution(generator),distribution(generator));
 		Node<Quaternion>* newN = new Node<Quaternion>(newQ);
-		print_quat(newQ);
-		print_node(newN);
 		all_nodes.push_back(newN);
 		graph->add_node(newN);
-		print_node(newN);
 	}
 	cout<<graph->get_nr_nodes();
 	double dist = 20000000;
 	cout<<"\n";
-	print_node(all_nodes[1]);
-	Node<Quaternion>* cl = (Node<Quaternion>*) graph->find_closest(all_nodes[0],&dist);
+	print_node(testN);
+	Node<Quaternion>* cl = (Node<Quaternion>*) graph->find_closest(testN,&dist);
 	print_node(cl);
+	cout<<"DIST "<<dist;
 	/*
 	std::vector<state_node_t*> all_nodes;
 	state_node_t* query_node = new state_node_t(dimension);
