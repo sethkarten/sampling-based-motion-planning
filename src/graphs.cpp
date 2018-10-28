@@ -21,13 +21,6 @@ void Node<T>::addNeighbor(graphs::Node<T> &n, double cost) {
 
 
 template <class T>
-Node<T>::Node(T& data) {
-    this.storedData = data;
-    this.g = 0;
-    this.h = 0;
-}
-
-template <class T>
 void Graph<T>::addVertex(T &data) {
     Node<T>& n = *(new Node<T>(data));
 

@@ -26,11 +26,12 @@ Quaternion::Quaternion() {
     Z = 0;
 }
 double Quaternion::distance(const Quaternion& b) const {
+    return sqrt( *this * b);
     const Quaternion c = b.normalize();
     double lambda = normalize() * c;
     return 1 - fabs(lambda);
 }
-bool Quaternion::operator=(const Quaternion &q) const {
+bool Quaternion::operator==(const Quaternion &q) const {
     return distance(q) <= .001;
 }
 Quaternion Quaternion::interpolate(const Quaternion& b,double f) const{
@@ -77,7 +78,6 @@ PQP_REAL** Quaternion::to_rotation_matrix() {
     return r_m;
 }
 Quaternion Quaternion::uniform_sample(int max) {
-    srand(max);
     double s = rand();
     double sigma1 = sqrt(1 - s);
     double sigma2 = sqrt(s);
@@ -87,6 +87,10 @@ Quaternion Quaternion::uniform_sample(int max) {
     double x = sin(theta1) * sigma1;
     double y = cos(theta1) * sigma1;
     double z = sin(theta2) * sigma2;
+    w = rand();
+    x = rand();
+    y = rand();
+    z = rand();
     return Quaternion(w, x, y, z);  // returns normalized quaternions
 }
 double Quaternion::operator * (const Quaternion& b)const {

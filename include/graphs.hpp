@@ -6,16 +6,20 @@
 #define SAMPLING_GRAPH_H
 
 #include <gnn.hpp>
+
 using namespace gnn;
 namespace graphs {
     template<class T>
     class Node : public proximity_node_t {
     public:
-        Node(T &data);
-
         T storedData;
         double g, h;
-        std::vector <std::pair<Node<T> &, double>> neighbors;
+        Node(T data):proximity_node_t(){
+            this->storedData = T(data);
+            this->g = 0;
+            this->h = 0;
+        };
+
 
         bool operator<(const Node &n) const;
         bool operator=(const Node &n) const;
@@ -33,7 +37,6 @@ namespace graphs{
     template <class T>
     class Graph : public graph_nearest_neighbors_t{
     public:
-        std::unordered_set<Node<T>> vertices;
         Graph(std::function<double(proximity_node_t*, proximity_node_t*)>fun):graph_nearest_neighbors_t(fun){
 
         }

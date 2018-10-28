@@ -13,7 +13,7 @@ public:
     double distance(const Quaternion& b) const;
     Quaternion interpolate(const Quaternion& b,double f) const;
     PQP_REAL** to_rotation_matrix();
-    bool operator=(const Quaternion& q) const;
+    bool operator==(const Quaternion& q) const;
     static Quaternion uniform_sample(int max);
 private:
     double operator*(const Quaternion& b)const;
