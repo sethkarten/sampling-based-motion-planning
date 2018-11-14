@@ -1,4 +1,4 @@
-from math import fabs
+from math import fabs, sqrt
 from pyquaternion import Quaternion as Q
 import sys, random, numpy as np
 sys.path.insert(0, '../../pqp_server/pyscript')
@@ -12,6 +12,14 @@ class SE3:
         self.Y = y
         self.Z = z
         self.q = q
+
+    @staticmethod
+    def distance(a, b):
+        return Q.sym_distance(a.q, b.q) + euclid_dist(a, b)
+
+    @staticmethod
+    def euclid_dist(a, b):
+        return sqrt((a.X - b.X)*(a.X - b.X) + (a.Y - b.Y)*(a.Y - b.Y) +  (a.Z - b.Z)*(a.Z - b.Z))
 
     def get_transition_rotation(self):
         T = [self.X, self.Y, self.Z]
