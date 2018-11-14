@@ -26,11 +26,16 @@ class SE3:
         maxY = 1
         minZ = -1
         maxZ = 1
-        x = random.uniform(minX, maxX)
-        y = random.uniform(minY, maxY)
-        z = random.uniform(minZ, maxZ)
-        q = Q.random()
-        return SE3(x,y,z,q)
+        while True:
+            x = random.uniform(minX, maxX)
+            y = random.uniform(minY, maxY)
+            z = random.uniform(minZ, maxZ)
+            q = Q.random()
+            state = SE3(x,y,z,q)
+            T, R = state.get_transition_rotation()
+            if not pqp_client(T, R):
+                # no collision
+                return state
     '''
     Returns True if there is a collision
     '''
