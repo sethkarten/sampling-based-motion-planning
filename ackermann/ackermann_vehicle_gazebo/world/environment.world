@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<sdf version="1.4">
+  <world name="environment">
+
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <include>
+      <uri>model://maze</uri>
+    </include>
+
+  </world>
+</sdf>
