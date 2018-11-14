@@ -15,7 +15,7 @@ class SE3:
 
     @staticmethod
     def distance(a, b):
-        return Q.sym_distance(a.q, b.q) + euclid_dist(a, b)
+        return Q.sym_distance(a.q, b.q) + SE3.euclid_dist(a, b)
 
     @staticmethod
     def euclid_dist(a, b):
