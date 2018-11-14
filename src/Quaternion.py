@@ -1,47 +1,10 @@
+# Deprecated
+
 from math import sin, cos, fabs, acos, sqrt
 from random import random as rand
-import sys
-sys.path.insert(0, '../../pqp_server/pyscript')
-from pqp_ros_client import pqp_client
 
 
-class SE3:
-    def __init__(x,y,z,q):
-        self.X = x
-        self.Y = y
-        self.Z = z
-        self.q = q
 
-    '''
-    Returns True if there is a collision
-    '''
-    @staticmethod
-    def check_collide(self, other):
-        x_res = y_res = z_res = 0.1
-        if self.X > other.X:
-            x_res *= -1
-        if self.Y > other.Y:
-            x_res *= -1
-        if self.Z > other.Z:
-            x_res *= -1
-        x = self.X
-        y = self.Y
-        z = self.Z
-        q = self.q
-        while fabs(x - other.X) > 0.1\
-        and fabs(y - other.Y) > 0.1\
-        and fabs(Z - other.Z) > 0.1\
-        and fabs(Quaternion.distance(q, other.q)) > 0.1:
-            T = [x,y,z]
-            R = q.to_rotation_matrix()
-            if pqp_client(T, R):
-                # Collision
-                return True
-            x += x_res
-            y += y_res
-            z += z_res
-            q = Quaternion.interpolate(q, other.q)
-        return False
 
 
 class Quaternion:
@@ -106,12 +69,12 @@ class Quaternion:
         return r_m
 
     @staticmethod
-    def uniform_sample(max):
-        s = rand()*max
+    def uniform_sample():
+        s = rand()
         sigma1 = sqrt(1 - s)
         sigma2 = sqrt(s)
-        theta1 = 2 * M_PI * rand()*max
-        theta2 = 2 * M_PI * rand()*max
+        theta1 = 2 * M_PI * rand()
+        theta2 = 2 * M_PI * rand()
         w = cos(theta2) * sigma2
         x = sin(theta1) * sigma1
         y = cos(theta1) * sigma1
