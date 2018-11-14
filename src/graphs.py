@@ -7,7 +7,7 @@ from pqp_ros_client import pqp_client
 id_count = 0
 
 class SE3:
-    def __init__(x,y,z,q):
+    def __init__(self,x,y,z,q):
         self.X = x
         self.Y = y
         self.Z = z
@@ -18,6 +18,7 @@ class SE3:
         R = self.q.rotation_matrix.reshape(9).tolist()
         return T, R
 
+    @staticmethod
     def get_random_state():
         minX = -1
         maxX = 1
@@ -48,7 +49,7 @@ class SE3:
         q = self.q
         while fabs(x - other.X) > 0.1\
         and fabs(y - other.Y) > 0.1\
-        and fabs(Z - other.Z) > 0.1\
+        and fabs(z - other.Z) > 0.1\
         and fabs(Q.sym_distance(q, other.q)) > 0.1:
             T, R = self.get_transition_rotation()
             if pqp_client(T, R):
@@ -57,12 +58,12 @@ class SE3:
             x += x_res
             y += y_res
             z += z_res
-            q = Quaternion.slerp(q, other.q, amount=0.1)
+            q = Q.slerp(q, other.q, amount=0.1)
         return False
 
 
 class Node:
-    def __init__(data):
+    def __init__(self, data):
         global id_count
         self.data = data    # SE3
         self.g = 0
@@ -75,13 +76,13 @@ class Node:
         return self.g + self.h < other.g + other.h
 
 class Edge:
-    def __init__(neighbor, cost):
+    def __init__(self, neighbor, cost):
         self.neighbor = neighbor
         self.cost = cost
 
 class Graph:
 
-    def __init__():
+    def __init__(self):
         self.graph = {}
 
     def addNeighbor(self, node, neighbor, cost):
