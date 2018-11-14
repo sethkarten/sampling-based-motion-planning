@@ -28,7 +28,7 @@ class SE3:
         maxZ = 1
         x = random.uniform(minX, maxX)
         y = random.uniform(minY, maxY)
-        z = random.uniform(minX, maxX)
+        z = random.uniform(minZ, maxZ)
         q = Q.random()
         return SE3(x,y,z,q)
     '''
