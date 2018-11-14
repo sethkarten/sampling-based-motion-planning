@@ -1,8 +1,9 @@
 from math import fabs
 from pyquaternion import Quaternion as Q
-import sys
+import sys, random, numpy as np
 sys.path.insert(0, '../../pqp_server/pyscript')
 from pqp_ros_client import pqp_client
+
 id_count = 0
 
 class SE3:
@@ -12,6 +13,23 @@ class SE3:
         self.Z = z
         self.q = q
 
+    def get_transition_rotation(self):
+        T = [self.X, self.Y, self.Z]
+        R = self.q.rotation_matrix.reshape(9).tolist()
+        return T, R
+
+    def get_random_state():
+        minX = -1
+        maxX = 1
+        minY = -1
+        maxY = 1
+        minZ = -1
+        maxZ = 1
+        x = random.uniform(minX, maxX)
+        y = random.uniform(minY, maxY)
+        z = random.uniform(minX, maxX)
+        q = Q.random()
+        return SE3(x,y,z,q)
     '''
     Returns True if there is a collision
     '''
@@ -32,8 +50,7 @@ class SE3:
         and fabs(y - other.Y) > 0.1\
         and fabs(Z - other.Z) > 0.1\
         and fabs(Q.sym_distance(q, other.q)) > 0.1:
-            T = [x,y,z]
-            R = q.rotation_matrix.reshape(9).tolist()
+            T, R = self.get_transition_rotation()
             if pqp_client(T, R):
                 # Collision
                 return True

@@ -1,11 +1,6 @@
 # Deprecated
-
 from math import sin, cos, fabs, acos, sqrt
 from random import random as rand
-
-
-
-
 
 class Quaternion:
     def __init__(w, x, y, z):
