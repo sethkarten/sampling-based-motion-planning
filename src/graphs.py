@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from math import fabs, sqrt, pi
+from math import fabs, sqrt, pi, cos, sin
 from pyquaternion import Quaternion as Q
 import sys, random
 from heapq import heappush, heappop
@@ -33,7 +33,7 @@ class SE2:
         minX = -9
         maxX = 10
         minY = -7.5
-        maxY = 6.5
+        maxY = 6.
         while True:
             x = random.uniform(minX, maxX)
             y = random.uniform(minY, maxY)
@@ -44,9 +44,50 @@ class SE2:
             R = [rot.item(0,0),rot.item(0,1),rot.item(0,2),\
             rot.item(1,0),rot.item(1,1),rot.item(1,2),\
             rot.item(2,0),rot.item(2,1),rot.item(2,2)]
-            if not  pqp_client(T,R).result:
+            if not pqp_client(T,R).result:
                 # no collision
                 return state
+
+    @staticmethod
+    def get_random_control(state, vel):
+        linAccMin = -10.0
+        linAccMax = 10.0
+        steerAccMin = -5.0
+        steerAccMax = 5.0
+        # sample controls
+        collision = False
+        #while True:
+        linAcc = random.uniform(linAccMin, linAccMax)
+        steerAcc = random.uniform(steerAccMin, steerAccMax)
+        time = random.random()
+        inc = 0.05
+        t0 = 0
+        vx, vy, vs = vel[0], vel[1], vel[2]
+        x, y, s  = state.X, state.Y, state.theta
+        while t0 < time:
+            x += (vx*inc + linAcc*inc*inc) * cos(s) * cos(steerAcc)
+            vx += linAcc * inc * cos(s) * cos(steerAcc)
+            y += (vy*inc + linAcc*inc*inc) * sin(s) * cos(steerAcc)
+            vy += linAcc * inc * sin(s) * cos(steerAcc)
+            s += vs*inc + steerAcc*inc*inc * sin(steerAcc)
+            vs += steerAcc * inc * sin(steerAcc)
+            t0 += inc
+        return (SE2(x,y,s), [vx,vy,vs])
+        '''
+                T = [x,y,0]
+                rot = tf.transformations.euler_matrix(0,0,s)
+                R = [rot.item(0,0),rot.item(0,1),rot.item(0,2),\
+                rot.item(1,0),rot.item(1,1),rot.item(1,2),\
+                rot.item(2,0),rot.item(2,1),rot.item(2,2)]
+                collision = pqp_client(T,R).result
+
+                if collision:
+                    # Collision
+                    break
+
+            if not collision:
+        '''
+
 
 
 class SE3:
@@ -93,12 +134,12 @@ class SE3:
 
     @staticmethod
     def get_random_state():
-        minX = -10
+        minX = 0
         maxX = 10
-        minY = -10
+        minY = 0
         maxY = 10
         minZ = 0
-        maxZ = 5
+        maxZ = 3
         while True:
             x = random.uniform(minX, maxX)
             y = random.uniform(minY, maxY)
@@ -122,23 +163,25 @@ class SE3:
         x_inc = x_inc / mag * inc
         y_inc = y_inc / mag * inc
         z_inc = z_inc / mag * inc
+        steps = mag / ((x_inc+y_inc+z_inc)/3)
+        steering_inc = 0.03
         x = a.X
         y = a.Y
         z = a.Z
         q = a.q
         cur = a
         while SE3.euclid_dist(cur, b) > inc\
-        or fabs(Q.sym_distance(q, b.q)) > 0.03:
+        or fabs(Q.sym_distance(q, b.q)) > steering_inc:
             T, R = cur.get_transition_rotation()
-            if  pqp_client(T,R).result:
+            if pqp_client(T,R).result:
                 # Collision
                 return False
             if SE3.euclid_dist(cur, b) > inc:
                 x += x_inc
                 y += y_inc
                 z += z_inc
-            if fabs(Q.sym_distance(q, b.q)) > 0.03:
-                q = Q.slerp(q, b.q, amount=0.03)
+            if fabs(Q.sym_distance(q, b.q)) > steering_inc:
+                q = Q.slerp(q, b.q, amount=steering_inc)
             cur = SE3(x, y, z, q)
         return True
 

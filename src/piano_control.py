@@ -5,7 +5,7 @@ from gazebo_msgs.srv import SetModelState, GetModelState
 from pyquaternion import Quaternion as Q
 from random import uniform
 from graphs import SE3
-from math import sqrt, fabs
+from math import sqrt, fabs, pi
 from time import sleep
 import tf
 
@@ -53,7 +53,6 @@ class PianoControl:
         a = SE3(current_model_state.pose.position.x, current_model_state.pose.position.y,\
          current_model_state.pose.position.z, quat)
         inc = 0.1
-        steering_inc = 0.03
         x_inc = b.X - a.X
         y_inc = b.Y - a.Y
         z_inc = b.Z - a.Z
@@ -61,6 +60,8 @@ class PianoControl:
         x_inc = x_inc / mag * inc
         y_inc = y_inc / mag * inc
         z_inc = z_inc / mag * inc
+        steps = mag / ((x_inc+y_inc+z_inc)/3)
+        steering_inc = 0.03
         x = a.X
         y = a.Y
         z = a.Z
@@ -74,7 +75,7 @@ class PianoControl:
                 x += x_inc
                 y += y_inc
                 z += z_inc
-            if fabs(Q.sym_distance(q, b.q)) > steering_inc:
+            if Q.sym_distance(q, b.q) > steering_inc:
                 q = Q.slerp(q, b.q, amount=steering_inc)
             cur = SE3(x, y, z, q)
             sleep(0.05)
