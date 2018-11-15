@@ -72,30 +72,33 @@ class SE3:
     Returns True if there is a collision
     '''
     @staticmethod
-    def check_collide(self, other):
-        x_res = y_res = z_res = 0.1
-        if self.X > other.X:
-            x_res *= -1
-        if self.Y > other.Y:
-            x_res *= -1
-        if self.Z > other.Z:
-            x_res *= -1
-        x = self.X
-        y = self.Y
-        z = self.Z
-        q = self.q
-        while fabs(x - other.X) > 0.1\
-        and fabs(y - other.Y) > 0.1\
-        and fabs(z - other.Z) > 0.1\
-        and fabs(Q.sym_distance(q, other.q)) > 0.1:
-            T, R = self.get_transition_rotation()
+    def check_collide(a, b):
+        inc = 0.1
+        x_inc = a.X - b.X
+        y_inc = a.Y - b.Y
+        z_inc = a.Z - b.Z
+        mag = sqrt(x_inc*x_inc + y_inc*y_inc + z_inc*z_inc)
+        x_inc = x_inc / mag * inc
+        y_inc = y_inc / mag * inc
+        z_inc = z_inc / mag * inc
+        x = a.X
+        y = a.Y
+        z = a.Z
+        q = a.q
+        cur = a
+        while SE3.euclid_dist(cur, b) > inc\
+        or fabs(Q.sym_distance(q, b.q)) > 0.02:
+            T, R = cur.get_transition_rotation()
             if pqp_client(T, R):
                 # Collision
                 return True
-            x += x_res
-            y += y_res
-            z += z_res
-            q = Q.slerp(q, other.q, amount=0.1)
+            if SE3.euclid_dist(cur, b) > inc:
+                x += x_inc
+                y += y_inc
+                z += z_inc
+            if fabs(Q.sym_distance(q, b.q)) > 0.02:
+                q = Q.slerp(q, b.q, amount=0.02)
+            cur = SE3(x, y, z, w)
         return False
 
 
