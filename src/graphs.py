@@ -1,7 +1,7 @@
 from math import fabs, sqrt
 from pyquaternion import Quaternion as Q
 import sys, random, numpy as np
-from Queue import PriorityQueue
+from heapq import heappush, heappop
 sys.path.insert(0, '../../pqp_server/pyscript')
 from pqp_ros_client import pqp_client
 
@@ -90,9 +90,6 @@ class Node:
         id_count += 1
         self.f = sys.maxint
 
-    def __eq__(self, other):
-        return self.data == other.data
-
     def __leq__(self, other):
         return self.f < other.f
 
@@ -133,10 +130,10 @@ class Graph:
         dist[start.id] = 0      # Distance from source to source
         start.f = h(start, target)
         fringe = PriorityQueue()
-        fringe.put(start)
+        fringe.enqueue(start)
         while not fringe.empty():
-            node = fringe.get()
-            if node == target:
+            node = fringe.dequeue()
+            if node.data == target.data:
                 print dist[node.id]
                 return make_path(prev, node)
             closed[node.id] = node
@@ -150,4 +147,17 @@ class Graph:
                 dist[neighbor.id] = new_g
                 prev[neighbor.id] = node
                 neighbor.f = new_g + h(neighbor.data, target.data)
-                fringe.put(neighbor)
+                fringe.enqueue(neighbor)
+
+class PriorityQueue:
+    def __init__(self):
+        self.heap = []
+
+    def enqueue(self, node):
+        heappush(self.heap, node)
+
+    def is_empty(self):
+        return len(self.heap) == 0
+
+    def dequeue(self):
+        return heapop(self.heap)
