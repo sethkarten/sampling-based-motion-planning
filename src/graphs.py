@@ -13,9 +13,25 @@ class SE3:
         self.Z = z
         self.q = q
 
+    def unpack(self):
+        list = []
+        list.append(self.X)
+        list.append(self.Y)
+        list.append(self.Z)
+        tmp = self.q.elements
+        for j in tmp:
+            list.append(j)
+        return np.array(list)
+    @staticmethod
+    def repack(data):
+        x = data[0]
+        y = data[1]
+        z = data[2]
+        q = Q(data[3],data[4],data[5],data[6])
+        return SE3(x,y,z,Q(q))
     @staticmethod
     def distance(a, b):
-        return Q.sym_distance(a.q, b.q) + SE3.euclid_dist(a, b)
+        return Q.distance(a.q, b.q) + SE3.euclid_dist(a, b)
 
     @staticmethod
     def euclid_dist(a, b):
@@ -41,7 +57,7 @@ class SE3:
             q = Q.random()
             state = SE3(x,y,z,q)
             T, R = state.get_transition_rotation()
-            if not pqp_client(T, R):
+            if pqp_client(T, R):
                 # no collision
                 return state
     '''
