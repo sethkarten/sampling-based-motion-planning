@@ -85,7 +85,7 @@ if __name__ == "__main__":
     rocketPiano = PianoControl()
     for i in range(1000):
         sleep(1)
-        position = SE3(uniform(0,10),uniform(0,10),uniform(0,10), Q.random())
+        position = SE3.get_random_state()
         rocketPiano.interpolate(position)
         #rocketPiano.set_position(position)
         #rocketPiano.set_steering_angle(pose)

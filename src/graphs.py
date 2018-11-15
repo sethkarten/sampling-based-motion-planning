@@ -1,13 +1,53 @@
 #!/usr/bin/env python
-from math import fabs, sqrt
+from math import fabs, sqrt, pi
 from pyquaternion import Quaternion as Q
-import sys, random, numpy as np
+import sys, random
 from heapq import heappush, heappop
 sys.path.insert(0, '../../pqp_server/pyscript')
 from pqp_ros_client import pqp_client
+import tf, numpy as np
 
 id_count = 0
 PRECISION_DIGITS = 5
+
+class SE2:
+    def __init__(self, x, y, theta):
+        self.X = x
+        self.Y = y
+        self.theta = theta
+
+    def __eq__(self, other):
+        return self.X == other.X and self.Y == other.Y\
+         and self.theta == other.theta
+
+    @staticmethod
+    def distance(a, b):
+        return fabs(a.theta - other.theta) + euclid_dist(a, b)
+
+    @staticmethod
+    def euclid_dist(a, b):
+        return sqrt((a.X - b.X)*(a.X - b.X) + (a.Y - b.Y)*(a.Y - b.Y))
+
+    @staticmethod
+    def get_random_state():
+        minX = -9
+        maxX = 10
+        minY = -7.5
+        maxY = 6.5
+        while True:
+            x = random.uniform(minX, maxX)
+            y = random.uniform(minY, maxY)
+            theta = random.uniform(0, 2*pi)
+            state = SE2(x, y, theta)
+            T = [x,y,0]
+            rot = tf.transformations.euler_matrix(0,0,theta)
+            R = [rot.item(0,0),rot.item(0,1),rot.item(0,2),\
+            rot.item(1,0),rot.item(1,1),rot.item(1,2),\
+            rot.item(2,0),rot.item(2,1),rot.item(2,2)]
+            if pqp_client(T, R):
+                # no collision
+                return state
+
 
 class SE3:
     def __init__(self,x,y,z,q):
@@ -29,7 +69,7 @@ class SE3:
         for j in tmp:
             list.append(j)
         return np.array(list)
-        
+
     @staticmethod
     def repack(data):
         x = data[0]
@@ -53,9 +93,9 @@ class SE3:
 
     @staticmethod
     def get_random_state():
-        minX = 0
+        minX = -10
         maxX = 10
-        minY = 0
+        minY = -10
         maxY = 10
         minZ = 0
         maxZ = 10
