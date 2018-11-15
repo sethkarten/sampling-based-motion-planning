@@ -7,6 +7,7 @@ from random import uniform
 from graphs import SE3
 from math import sqrt, fabs
 from time import sleep
+import tf
 
 class PianoControl:
     def __init__(self):
@@ -83,10 +84,14 @@ class PianoControl:
 
 if __name__ == "__main__":
     rocketPiano = PianoControl()
+    position = SE3.get_random_state()
+    rocketPiano.interpolate(position)
+    old = position
     for i in range(1000):
         sleep(1)
         position = SE3.get_random_state()
-        rocketPiano.interpolate(position)
+        if SE3.check_collide(old, position):
+            rocketPiano.interpolate(position)
         #rocketPiano.set_position(position)
         #rocketPiano.set_steering_angle(pose)
     #rocketPiano.run()

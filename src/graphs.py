@@ -44,7 +44,7 @@ class SE2:
             R = [rot.item(0,0),rot.item(0,1),rot.item(0,2),\
             rot.item(1,0),rot.item(1,1),rot.item(1,2),\
             rot.item(2,0),rot.item(2,1),rot.item(2,2)]
-            if pqp_client(T, R):
+            if not  pqp_client(T,R).result:
                 # no collision
                 return state
 
@@ -93,9 +93,9 @@ class SE3:
 
     @staticmethod
     def get_random_state():
-        minX = -10
+        minX = 0
         maxX = 10
-        minY = -10
+        minY = 0
         maxY = 10
         minZ = 0
         maxZ = 10
@@ -106,15 +106,15 @@ class SE3:
             q = Q.random()
             state = SE3(x,y,z,q)
             T, R = state.get_transition_rotation()
-            if pqp_client(T, R):
+            if not pqp_client(T,R).result:
                 # no collision
                 return state
     '''
-    Returns True if there is a collision
+    Returns True if there is no collision
     '''
     @staticmethod
     def check_collide(a, b):
-        inc = 0.1
+        inc = 0.5
         x_inc = b.X - a.X
         y_inc = b.Y - a.Y
         z_inc = b.Z - a.Z
@@ -128,19 +128,19 @@ class SE3:
         q = a.q
         cur = a
         while SE3.euclid_dist(cur, b) > inc\
-        or fabs(Q.sym_distance(q, b.q)) > 0.02:
+        or fabs(Q.sym_distance(q, b.q)) > 0.03:
             T, R = cur.get_transition_rotation()
-            if pqp_client(T, R):
+            if  pqp_client(T,R).result:
                 # Collision
-                return True
+                return False
             if SE3.euclid_dist(cur, b) > inc:
                 x += x_inc
                 y += y_inc
                 z += z_inc
-            if fabs(Q.sym_distance(q, b.q)) > 0.02:
-                q = Q.slerp(q, b.q, amount=0.02)
-            cur = SE3(x, y, z, w)
-        return False
+            if fabs(Q.sym_distance(q, b.q)) > 0.03:
+                q = Q.slerp(q, b.q, amount=0.03)
+            cur = SE3(x, y, z, q)
+        return True
 
 
 class Node:
