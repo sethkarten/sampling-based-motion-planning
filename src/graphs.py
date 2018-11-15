@@ -74,9 +74,9 @@ class SE3:
     @staticmethod
     def check_collide(a, b):
         inc = 0.1
-        x_inc = a.X - b.X
-        y_inc = a.Y - b.Y
-        z_inc = a.Z - b.Z
+        x_inc = b.X - a.X
+        y_inc = b.Y - a.Y
+        z_inc = b.Z - a.Z
         mag = sqrt(x_inc*x_inc + y_inc*y_inc + z_inc*z_inc)
         x_inc = x_inc / mag * inc
         y_inc = y_inc / mag * inc
