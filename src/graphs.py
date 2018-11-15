@@ -140,7 +140,7 @@ class Graph:
             cur = prev[cur.id]
         return path
 
-    def AStarPath(start, target, d=SE.distance, h=SE3.distance):
+    def AStarPath(start, target, d=SE3.distance, h=SE3.distance):
         global PRECISION_DIGITS
         prev = {}               # Previous node in optimal path from source
         dist = {}               # Unknown distance from source to v
