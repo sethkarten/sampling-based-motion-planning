@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from math import fabs, sqrt
 from pyquaternion import Quaternion as Q
 import sys, random, numpy as np
@@ -15,6 +16,9 @@ class SE3:
         self.Z = z
         self.q = q
 
+    def __eq__(self, other):
+        return self.X == other.X and self.Y == other.Y\
+         and self.Z == other.Z and self.q == other.q
 
     def unpack(self):
         list = []
@@ -25,6 +29,7 @@ class SE3:
         for j in tmp:
             list.append(j)
         return np.array(list)
+        
     @staticmethod
     def repack(data):
         x = data[0]
@@ -32,10 +37,6 @@ class SE3:
         z = data[2]
         q = Q(data[3],data[4],data[5],data[6])
         return SE3(x,y,z,Q(q))
-
-    def __eq__(self, other):
-        return self.X == other.X and self.Y == other.Y\
-         and self.Z == other.Z and self.q == other.q
 
     @staticmethod
     def distance(a, b):
@@ -52,12 +53,12 @@ class SE3:
 
     @staticmethod
     def get_random_state():
-        minX = -1
-        maxX = 1
-        minY = -1
-        maxY = 1
-        minZ = -1
-        maxZ = 1
+        minX = 0
+        maxX = 10
+        minY = 0
+        maxY = 10
+        minZ = 0
+        maxZ = 10
         while True:
             x = random.uniform(minX, maxX)
             y = random.uniform(minY, maxY)
