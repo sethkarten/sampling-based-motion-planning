@@ -93,12 +93,12 @@ class SE3:
 
     @staticmethod
     def get_random_state():
-        minX = 0
+        minX = -10
         maxX = 10
-        minY = 0
+        minY = -10
         maxY = 10
         minZ = 0
-        maxZ = 10
+        maxZ = 5
         while True:
             x = random.uniform(minX, maxX)
             y = random.uniform(minY, maxY)
@@ -114,7 +114,7 @@ class SE3:
     '''
     @staticmethod
     def check_collide(a, b):
-        inc = 0.5
+        inc = 0.1
         x_inc = b.X - a.X
         y_inc = b.Y - a.Y
         z_inc = b.Z - a.Z
