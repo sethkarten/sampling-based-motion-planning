@@ -1,10 +1,12 @@
 from math import fabs, sqrt
 from pyquaternion import Quaternion as Q
 import sys, random, numpy as np
+from Queue import PriorityQueue
 sys.path.insert(0, '../../pqp_server/pyscript')
 from pqp_ros_client import pqp_client
 
 id_count = 0
+PRECISION_DIGITS = 5
 
 class SE3:
     def __init__(self,x,y,z,q):
@@ -12,6 +14,10 @@ class SE3:
         self.Y = y
         self.Z = z
         self.q = q
+
+    def __eq__(self, other):
+        return self.X == other.X and self.Y == other.Y\
+         and self.Z == other.Z and self.q == other.q
 
     @staticmethod
     def distance(a, b):
@@ -79,14 +85,16 @@ class Node:
     def __init__(self, data):
         global id_count
         self.data = data    # SE3
-        self.g = 0
-        self.h = 0
         self.id = id_count
         self.neighbors = []
         id_count += 1
+        self.f = sys.maxint
+
+    def __eq__(self, other):
+        return self.data == other.data
 
     def __leq__(self, other):
-        return self.g + self.h < other.g + other.h
+        return self.f < other.f
 
 class Edge:
     def __init__(self, neighbor, cost):
@@ -109,3 +117,37 @@ class Graph:
 
     def buildNeighbor(self):
         return
+
+    def make_path(prev, cur):
+        path = []
+        while cur.id in prev:
+            path.insert(0, cur.value)
+            cur = prev[cur.id]
+        return path
+
+    def AStarPath(start, target, d=SE.distance, h=SE3.distance):
+        global PRECISION_DIGITS
+        prev = {}               # Previous node in optimal path from source
+        dist = {}               # Unknown distance from source to v
+        closed = {}
+        dist[start.id] = 0      # Distance from source to source
+        start.f = h(start, target)
+        fringe = PriorityQueue()
+        fringe.put(start)
+        while not fringe.empty():
+            node = fringe.get()
+            if node == target:
+                print dist[node.id]
+                return make_path(prev, node)
+            closed[node.id] = node
+            for neighbor in node.neighbors:
+                if neighbor.id in closed:
+                    continue
+                new_g = round(d(node.data, neighbor.data) + dist[node.id], PRECISION_DIGITS)
+                if neighbor.id in dist:
+                    if new_g >= dist[neighbor.id]:
+                        continue
+                dist[neighbor.id] = new_g
+                prev[neighbor.id] = node
+                neighbor.f = new_g + h(neighbor.data, target.data)
+                fringe.put(neighbor)
