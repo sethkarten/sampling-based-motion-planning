@@ -142,7 +142,7 @@ class SE3:
     @staticmethod
     def get_random_state(ground=False):
         minX = 0
-        maxX = 10
+        maxX = 8
         minY = 0
         maxY = 10
         minZ = 0.317

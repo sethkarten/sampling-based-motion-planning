@@ -46,8 +46,8 @@ class PRM:
                     self.roadmap.addNeighbor(neighbor, node, cost)
 
 if __name__ == '__main__':
-    k = 3
-    numsamples = 50
+    k = 5
+    numsamples = 100
     map = PRM()
 
     nn = map.build_roadmap(k, samples = numsamples)
