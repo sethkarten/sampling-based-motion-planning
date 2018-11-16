@@ -19,6 +19,7 @@ class PRM:
         for n in range(5000):
             node = self.roadmap[n]
             neighbors = nng.query_k_nearest(node.data, k)
-            for neighbor in neighbors:
+            for i in range(k):
+                neighbor = nng.values[i]
                 cost = dist(node, neighbor)
                 self.roadmap.addNeighbor(node, neighbor, cost)
