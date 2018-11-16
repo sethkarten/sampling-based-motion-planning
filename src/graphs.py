@@ -33,60 +33,27 @@ class SE2:
         minX = -9
         maxX = 10
         minY = -7.5
-        maxY = 6.
-        while True:
-            x = random.uniform(minX, maxX)
-            y = random.uniform(minY, maxY)
-            theta = random.uniform(0, 2*pi)
-            state = SE2(x, y, theta)
-            T = [x,y,0]
-            rot = tf.transformations.euler_matrix(0,0,theta)
-            R = [rot.item(0,0),rot.item(0,1),rot.item(0,2),\
-            rot.item(1,0),rot.item(1,1),rot.item(1,2),\
-            rot.item(2,0),rot.item(2,1),rot.item(2,2)]
-            if not pqp_client(T,R).result:
-                # no collision
-                return state
+        maxY = 6.5
+        x = random.uniform(minX, maxX)
+        y = random.uniform(minY, maxY)
+        theta = random.uniform(0, 2*pi)
+        state = SE2(x, y, theta)
+        return state
 
     @staticmethod
     def get_random_control(state, vel):
-        linAccMin = -10.0
-        linAccMax = 10.0
-        steerAccMin = -5.0
-        steerAccMax = 5.0
+        linVelMin = -10.0
+        linVelMax = 10.0
+        steerVelMin = -5.0
+        steerVelMax = 5.0
         # sample controls
         collision = False
         #while True:
-        linAcc = random.uniform(linAccMin, linAccMax)
-        steerAcc = random.uniform(steerAccMin, steerAccMax)
+        linVel = random.uniform(linVelMin, linVelMax)
+        steerVel = random.uniform(steerVelMin, steerVelMax)
         time = random.random()
-        inc = 0.05
-        t0 = 0
-        vx, vy, vs = vel[0], vel[1], vel[2]
-        x, y, s  = state.X, state.Y, state.theta
-        while t0 < time:
-            x += (vx*inc + linAcc*inc*inc) * cos(s) * cos(steerAcc)
-            vx += linAcc * inc * cos(s) * cos(steerAcc)
-            y += (vy*inc + linAcc*inc*inc) * sin(s) * cos(steerAcc)
-            vy += linAcc * inc * sin(s) * cos(steerAcc)
-            s += vs*inc + steerAcc*inc*inc * sin(steerAcc)
-            vs += steerAcc * inc * sin(steerAcc)
-            t0 += inc
-        return (SE2(x,y,s), [vx,vy,vs])
-        '''
-                T = [x,y,0]
-                rot = tf.transformations.euler_matrix(0,0,s)
-                R = [rot.item(0,0),rot.item(0,1),rot.item(0,2),\
-                rot.item(1,0),rot.item(1,1),rot.item(1,2),\
-                rot.item(2,0),rot.item(2,1),rot.item(2,2)]
-                collision = pqp_client(T,R).result
+        return (linVel, time)
 
-                if collision:
-                    # Collision
-                    break
-
-            if not collision:
-        '''
 
 class SE3:
     def __init__(self,x,y,z,q):
@@ -193,6 +160,9 @@ class SE3:
                 q = Q.slerp(q, b.q, amount=steering_inc)
             cur = SE3(x, y, z, q)
         T, R = cur.get_transition_rotation()
+        if pqp_client(T, R).result:
+            return False
+        T, R = b.get_transition_rotation()
         if pqp_client(T, R).result:
             return False
         return True

@@ -4,6 +4,7 @@ from geometry_msgs.msg import Twist
 from gazebo_msgs.srv import SetModelState, GetModelState
 from kobuki_msgs.msg import BumperEvent
 from pyquaternion import Quaternion as Q
+from ackermann_msgs.msg import AckermannDrive
 import random
 from math import sin, cos
 from time import sleep
