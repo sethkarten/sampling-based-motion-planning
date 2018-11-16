@@ -99,6 +99,9 @@ class SE3:
         return self.X == other.X and self.Y == other.Y\
          and self.Z == other.Z and self.q == other.q
 
+    def __str__(self):
+        return str(self.X) + " " + str(self.Y) + " " + str(self.Z) + " " + str(self.q)
+
     def unpack(self):
         list = []
         list.append(self.X)

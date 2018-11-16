@@ -9,11 +9,9 @@ class PRM:
     def build_roadmap(self, k, dist=SE3.distance, samples=100):
         nng = nearestNeighbor()
         self.roadmap = Graph()
-        list = []
         for i in range(samples):
             new_state = SE3.get_random_state()
             self.roadmap.addVertex(Node(new_state))
-            list.append(new_state)
             nng.addPoint(new_state)
         nng.buildTree()
         for node in self.roadmap.graph.values():

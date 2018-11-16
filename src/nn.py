@@ -49,7 +49,7 @@ if __name__ == "__main__":
         print i
         print "getting rand"
         tmp = SE3.get_random_state()
-        print tmp.q
+        print tmp
         list.append(tmp)
         newg.addPoint(tmp)
 
