@@ -207,16 +207,13 @@ class Graph:
         self.graph = {}
 
     def addNeighbor(self, node, neighbor, cost):
-        if self.graph[node.id] is None:
+        if node.id not in self.graph:
             self.graph[node.id] = node
         node.neighbors.append(Edge(neighbor, cost))
 
     def addVertex(self, node):
-        if self.graph[node.id] is None:
+        if node.id not in self.graph:
             self.graph[node.id] = node
-
-    def buildNeighbor(self):
-        return
 
     def make_path(prev, cur):
         path = []
