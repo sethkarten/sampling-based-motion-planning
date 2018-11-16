@@ -47,7 +47,7 @@ class PRM:
 
 if __name__ == '__main__':
     k = 5
-    numsamples = 100
+    numsamples = 500
     map = PRM()
     nn = map.build_roadmap(k, samples = numsamples)
 

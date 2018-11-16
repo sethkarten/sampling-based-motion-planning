@@ -47,6 +47,22 @@ class PianoControl:
         model_state.pose.orientation.w = quat[3]
         self.set_model_state(model_state=model_state)
 
+    def set_state(self, se3):
+        model_state_resp = self.get_model_state(model_name="piano2")
+        model_state = SetModelState()
+        model_state.model_name = "piano2"
+        model_state.pose = model_state_resp.pose
+        model_state.twist = Twist()
+        model_state.reference_frame = "world"
+        model_state.pose.position.x = se3.X
+        model_state.pose.position.y = se3.Y
+        model_state.pose.position.z = se3.Z
+        model_state.pose.orientation.x = se3.q[0]
+        model_state.pose.orientation.y = se3.q[1]
+        model_state.pose.orientation.z = se3.q[2]
+        model_state.pose.orientation.w = se3.q[3]
+        self.set_model_state(model_state=model_state)
+
     def interpolate(self, b):
         current_model_state = self.get_model_state(model_name="piano2")
         quat = Q(current_model_state.pose.orientation.x, current_model_state.pose.orientation.y,\
@@ -79,6 +95,7 @@ class PianoControl:
                 q = Q.slerp(q, b.q, amount=steering_inc)
             cur = SE3(x, y, z, q)
             sleep(0.05)
+        self.set_state(b)
 
     def run(self):
         rospy.spin()
