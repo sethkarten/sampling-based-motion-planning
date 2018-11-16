@@ -41,18 +41,16 @@ class SE2:
         return state
 
     @staticmethod
-    def get_random_control(state, vel):
-        linVelMin = -10.0
-        linVelMax = 10.0
-        steerVelMin = -5.0
-        steerVelMax = 5.0
+    def get_random_control():
+        linVelMin = -17.8816
+        linVelMax = 17.8816
+        steerVelMin = -244.8696
+        steerVelMax = 244.8696
         # sample controls
-        collision = False
-        #while True:
         linVel = random.uniform(linVelMin, linVelMax)
         steerVel = random.uniform(steerVelMin, steerVelMax)
         time = random.random()
-        return (linVel, time)
+        return [linVel, steerVel], time
 
 
 class SE3:

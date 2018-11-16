@@ -20,8 +20,6 @@ class PianoControl:
         rospy.wait_for_service("/gazebo/set_model_state")
         self.set_model_state = rospy.ServiceProxy("/gazebo/set_model_state", SetModelState)
 
-        self.step_size = 10
-
     def set_position(self, position):
         model_state_resp = self.get_model_state(model_name="piano2")
         model_state = SetModelState()
