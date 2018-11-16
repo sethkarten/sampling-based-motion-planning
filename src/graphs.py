@@ -153,8 +153,8 @@ class SE3:
             z = random.uniform(minZ, maxZ)
             q = Q.random()
             if ground:
-                z=0.317
-                q = tf.transformations.quaternion_from_euler(0,0,random.random())
+                z = 0.317
+                q = tf.transformations.quaternion_from_euler(0,0,random.uniform(0,2*pi))
                 q = Q(q.item(0),q.item(1),q.item(2),q.item(3))
             state = SE3(x,y,z,q)
             T, R = state.get_transition_rotation()
