@@ -46,27 +46,35 @@ class PRM:
                     self.roadmap.addNeighbor(neighbor, node, cost)
 
 if __name__ == '__main__':
-    k = 3
-    numsamples = 50
+    k = 5
+    numsamples = 500
     map = PRM()
-
     nn = map.build_roadmap(k, samples = numsamples)
-    start = Node(SE3.get_random_state(ground=True))
-    goal = Node(SE3.get_random_state(ground=True))
-    map.add_points(start, goal, nn, k)
-    print "Start: "+str(start), "Goal: "+str(goal)
 
-    path = map.roadmap.AStarPath(start, goal)
-    path_s = []
-    for s in path:
-        path_s.append(str(s))
-    print path_s
+    while True:
+        text = raw_input('Get new path? Y/N')
+        if text == 'N':
+            break
+        start = Node(SE3.get_random_state(ground=True))
+        goal = Node(SE3.get_random_state(ground=True))
+        map.add_points(start, goal, nn, k)
+        print "Start: "+str(start), "Goal: "+str(goal)
 
-    rocketPiano = PianoControl()
-    rocketPiano.set_position(start.data)
-    rocketPiano.set_steering_angle(start.data.q)
-    print start.data
-    for state in path:
-        sleep(2)
-        print state
-        rocketPiano.interpolate(state)
+        path = map.roadmap.AStarPath(start, goal)
+        if path == None:
+            continue
+        path_s = []
+        for s in path:
+            path_s.append(str(s))
+        print path_s
+
+        raw_input('Start A*?')
+
+        rocketPiano = PianoControl()
+        rocketPiano.set_position(start.data)
+        rocketPiano.set_steering_angle(start.data.q)
+        print start.data
+        for state in path:
+            sleep(2)
+            print state
+            rocketPiano.interpolate(state)

@@ -485,4 +485,8 @@ def _get_steer_ang(phi):
 # main
 if __name__ == "__main__":
     ctrlr = _AckermannCtrlr()
+    #msg = AckermannDrive()
+    #msg.speed = 100.0
+    #msg.steering_angle_velocity = 100.0
+    #ctrlr.ackermann_cmd_cb(msg)
     ctrlr.spin()
