@@ -7,7 +7,6 @@ sys.path.insert(0, '../../pqp_server/pyscript')
 from pqp_ros_client import pqp_client
 import tf, numpy as np
 
-id_count = 0
 PRECISION_DIGITS = 5
 
 class SE2:
@@ -100,7 +99,10 @@ class SE3:
          and self.Z == other.Z and self.q == other.q
 
     def __str__(self):
-        return str(self.X) + " " + str(self.Y) + " " + str(self.Z) + " " + str(self.q)
+        return str(round(self.X, PRECISION_DIGITS)) + " " +\
+        str(round(self.Y, PRECISION_DIGITS)) + " " +\
+        str(round(self.Z, PRECISION_DIGITS)) + " " +\
+        str(self.q)
 
     def unpack(self):
         list = []
@@ -193,9 +195,8 @@ class Node:
     def __init__(self, data):
         global id_count
         self.data = data    # SE3
-        self.id = id_count
+        self.id = str(data)
         self.neighbors = []
-        id_count += 1
         self.f = sys.maxint
 
     def __leq__(self, other):

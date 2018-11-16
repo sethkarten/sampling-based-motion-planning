@@ -18,6 +18,8 @@ class PRM:
         for node in self.roadmap.graph.values():
             neighbors, distances = nn.query_k_nearest(node.data, k)
             for neighbor, cost in zip(neighbors, distances):
+                print neighbor
+                neighbor = self.roadmap.graph[str(neighbor)]
                 self.roadmap.addNeighbor(node, neighbor, cost)
         return nn
 
@@ -29,6 +31,7 @@ class PRM:
             nn.buildTree()
             neighbors, distances = nn.query_k_nearest(point, k)
             for neighbor, cost in zip(neighbors, distances):
+                neighbor = self.roadmap.graph[str(neighbor)]
                 self.roadmap.addNeighbor(node, neighbor, cost)
 
 if __name__ == '__main__':
