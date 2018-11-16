@@ -16,10 +16,9 @@ class PRM:
             nn.addPoint(new_state)
         nn.buildTree()
         for node in self.roadmap.graph.values():
-<<<<<<< HEAD
             neighbors, distances = nn.query_k_nearest(node.data, k)
             for j in range(len(neighbors)):
-                neighbor = nng.values[neighbors[j]]
+                neighbor = nn.values[neighbors[j]]
                 cost = distances[j]
         return nn
 
@@ -32,13 +31,6 @@ class PRM:
             neighbors, distances = nn.query_k_nearest(point, k)
             for j in range(len(neighbors)):
                 neighbor = SE3.repack(nn.values[neighbors[j]])
-=======
-            neighbors,distances = nng.query_k_nearest(node.data, k)
-            print neighbors
-            for j in range(0,len(neighbors)):
-                neighbor = nng.values[neighbors[j]]
-                print neighbor
->>>>>>> b920aad9e8201f1920246198e3591685842b7d02
                 cost = distances[j]
                 self.roadmap.addNeighbor(node, neighbor, cost)
 
