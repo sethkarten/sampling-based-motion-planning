@@ -37,7 +37,7 @@ class nearestNeighbor:
         for i in toRemove:
             del distances[0][i]
             del indices[0][i]
-        for j in range(0,len(indices)):
+        for j in range(0,len(indices[0])):
             indices[0][j] = SE3.repack(self.values[indices[0][j]])
         if len(indices[0]) > k:
             del indices[0][k]

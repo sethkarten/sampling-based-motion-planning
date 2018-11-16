@@ -102,7 +102,10 @@ class SE3:
         return str(round(self.X, PRECISION_DIGITS)) + " " +\
         str(round(self.Y, PRECISION_DIGITS)) + " " +\
         str(round(self.Z, PRECISION_DIGITS)) + " " +\
-        str(self.q)
+        str(round(self.q[0], PRECISION_DIGITS)) + " " +\
+        str(round(self.q[1], PRECISION_DIGITS)) + " " +\
+        str(round(self.q[2], PRECISION_DIGITS)) + " " +\
+        str(round(self.q[3], PRECISION_DIGITS))
 
     def unpack(self):
         list = []

@@ -18,8 +18,8 @@ class PRM:
         for node in self.roadmap.graph.values():
             neighbors, distances = nn.query_k_nearest(node.data, k)
             for neighbor, cost in zip(neighbors, distances):
-                print neighbor
-                neighbor = self.roadmap.graph[str(neighbor)]
+                string_neigh = str(neighbor)
+                neighbor = self.roadmap.graph[string_neigh]
                 self.roadmap.addNeighbor(node, neighbor, cost)
         return nn
 
@@ -42,13 +42,13 @@ if __name__ == '__main__':
     start = Node(SE3.get_random_state(ground=True))
     goal = Node(SE3.get_random_state(ground=True))
     map.add_points(start, goal, nn, k)
-    print start.id
 
     path = map.roadmap.AStarPath(start, goal)
     print path
 
     rocketPiano = PianoControl()
-    rocketPiano.interpolate(start)
+    rocketPiano.set_position(start)
+    rocketPiano.set_steering_angle(start.q)
     old = position
     for state in path:
         rocketPiano.interpolate(state)
