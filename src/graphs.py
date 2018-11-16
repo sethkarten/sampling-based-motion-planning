@@ -8,6 +8,12 @@ from pqp_ros_client import pqp_client
 from Parameters import *
 import tf, numpy as np
 
+
+import random
+import time
+random.seed(time.time())
+
+
 PRECISION_DIGITS = 5
 
 class SE2:
@@ -30,10 +36,10 @@ class SE2:
 
     @staticmethod
     def get_random_state():
-        minX = -9
+        minX = -10
         maxX = 10
-        minY = -7.5
-        maxY = 6.
+        minY = -10
+        maxY = 10
         while True:
             x = random.uniform(minX, maxX)
             y = random.uniform(minY, maxY)
