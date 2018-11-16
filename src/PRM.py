@@ -17,9 +17,8 @@ class PRM:
         nn.buildTree()
         for node in self.roadmap.graph.values():
             neighbors, distances = nn.query_k_nearest(node.data, k)
-            for j in range(len(neighbors)):
-                neighbor = nn.values[neighbors[j]]
-                cost = distances[j]
+            for neighbor, cost in zip(neighbors, distances):
+                self.roadmap.addNeighbor(node, neighbor, cost)
         return nn
 
     def add_points(self, node1, node2, nn, k):
@@ -29,9 +28,7 @@ class PRM:
             nn.addPoint(point)
             nn.buildTree()
             neighbors, distances = nn.query_k_nearest(point, k)
-            for j in range(len(neighbors)):
-                neighbor = SE3.repack(nn.values[neighbors[j]])
-                cost = distances[j]
+            for neighbor, cost in zip(neighbors, distances):
                 self.roadmap.addNeighbor(node, neighbor, cost)
 
 if __name__ == '__main__':
@@ -42,8 +39,9 @@ if __name__ == '__main__':
     start = Node(SE3.get_random_state(ground=True))
     goal = Node(SE3.get_random_state(ground=True))
     map.add_points(start, goal, nn, k)
+    print start.id
 
-    path = map.AStarPath(start, target)
+    path = map.roadmap.AStarPath(start, goal)
     print path
 
     rocketPiano = PianoControl()

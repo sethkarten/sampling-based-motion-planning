@@ -231,7 +231,7 @@ class Graph:
             cur = prev[cur.id]
         return path
 
-    def AStarPath(start, target, h=SE3.distance):
+    def AStarPath(self, start, target, h=SE3.distance):
         global PRECISION_DIGITS
         prev = {}               # Previous node in optimal path from source
         dist = {}               # Unknown distance from source to v
@@ -240,7 +240,7 @@ class Graph:
         start.f = h(start.data, target.data)
         fringe = PriorityQueue()
         fringe.enqueue(start)
-        while not fringe.empty():
+        while not fringe.is_empty():
             node = fringe.dequeue()
             if node.data == target.data:
                 print dist[node.id]
@@ -270,4 +270,4 @@ class PriorityQueue:
         return len(self.heap) == 0
 
     def dequeue(self):
-        return heapop(self.heap)
+        return heappop(self.heap)
