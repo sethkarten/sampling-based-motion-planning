@@ -46,6 +46,20 @@ class SE2:
         state = SE2(x, y, theta)
         return state
 
+    def unpack(self):
+        list = []
+        list.append(self.X)
+        list.append(self.Y)
+        list.append(self.theta)
+        return np.array(list)
+
+    @staticmethod
+    def repack(data):
+        x = data[0]
+        y = data[1]
+        theta = data[2]
+        return SE2(x,y,theta)
+
     @staticmethod
     def get_random_control():
         linVelMin = -17.8816
