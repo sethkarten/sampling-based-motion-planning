@@ -57,7 +57,5 @@ if __name__ == "__main__":
         newg.addPoint(tmp)
 
     newg.buildTree()
-    print newg.values[0]
-    print newg.values[1]
     print "query"
-    print newg.query_k_nearest(list[0],2)
+    print newg.query_k_nearest(list[0],2)[0]
