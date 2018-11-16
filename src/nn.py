@@ -33,7 +33,7 @@ if __name__ == "__main__":
     for i in range(0,100):
         print i
         tmp = SE3.get_random_state()
-        print tmp.q
+        print tmp
         list.append(tmp)
         newg.addPoint(tmp)
 

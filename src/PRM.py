@@ -9,20 +9,17 @@ class PRM:
     def build_roadmap(self, k, dist=SE3.distance, samples=100):
         nng = nearestNeighbor()
         self.roadmap = Graph()
-        list = []
         for i in range(samples):
             new_state = SE3.get_random_state()
             self.roadmap.addVertex(Node(new_state))
-            list.append(new_state)
             nng.addPoint(new_state)
         nng.buildTree()
         for node in self.roadmap.graph.values():
-            neighbors = nng.query_k_nearest(node.data, k)
-            print neigbors
-            for j in range(k):
+            neighbors = nng.query_k_nearest([node.data.unpack()], k)[0]
+            for j in range(1, k):
+                # Ignore edge to self
                 neighbor = SE3.repack(nng.values[neighbors[j]])
-                print neighbor
-                cost = dist(node, neighbor)
+                cost = dist(node.data, neighbor)
                 self.roadmap.addNeighbor(node, neighbor, cost)
 
 if __name__ == '__main__':
