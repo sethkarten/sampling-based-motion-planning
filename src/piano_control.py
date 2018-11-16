@@ -86,6 +86,7 @@ class PianoControl:
 if __name__ == "__main__":
     rocketPiano = PianoControl()
     position = SE3.get_random_state(ground=True)
+    print position
     rocketPiano.interpolate(position)
     old = position
     for i in range(1000):

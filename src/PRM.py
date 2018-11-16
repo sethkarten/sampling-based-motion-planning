@@ -60,6 +60,6 @@ if __name__ == '__main__':
     rocketPiano.set_steering_angle(start.data.q)
     print start.data
     for state in path:
-        sleep(1)
+        sleep(2)
         print state
         rocketPiano.interpolate(state)
