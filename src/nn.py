@@ -58,4 +58,6 @@ if __name__ == "__main__":
 
     newg.buildTree()
     print "query"
-    print newg.query_k_nearest(list[0],2)[0]
+    vals,dist = newg.query_k_nearest(list[0],10)
+    for j in vals:
+        print j
