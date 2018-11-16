@@ -17,18 +17,21 @@ random.seed(time.time())
 PRECISION_DIGITS = 5
 
 class SE2:
-    def __init__(self, x, y, theta):
+    def __init__(self, x, y, s, vLin, vS):
         self.X = x
         self.Y = y
-        self.theta = theta
+        self.s = s
+        self.vLin = vLin
+        self.vS = vS
+
 
     def __eq__(self, other):
         return self.X == other.X and self.Y == other.Y\
-         and self.theta == other.theta
+         and self.s == other.s
 
     @staticmethod
     def distance(a, b):
-        return fabs(a.theta - other.theta) + euclid_dist(a, b)
+        return fabs(a.s - other.s) + euclid_dist(a, b)
 
     @staticmethod
     def euclid_dist(a, b):
@@ -42,8 +45,8 @@ class SE2:
         maxY = 6.5
         x = random.uniform(minX, maxX)
         y = random.uniform(minY, maxY)
-        theta = random.uniform(0, 2*pi)
-        state = SE2(x, y, theta)
+        s = random.uniform(0, 2*pi)
+        state = SE2(x, y, s)
         return state
 
     def unpack(self):
@@ -62,15 +65,15 @@ class SE2:
 
     @staticmethod
     def get_random_control():
-        linVelMin = -17.8816
+        linVelMin = 0
         linVelMax = 17.8816
         steerVelMin = -244.8696
         steerVelMax = 244.8696
         # sample controls
         linVel = random.uniform(linVelMin, linVelMax)
         steerVel = random.uniform(steerVelMin, steerVelMax)
-        time = random.random()
-        return [linVel, steerVel], time
+        #time = random.uniform(0.0,1.0)
+        return [linVel, steerVel]
 
 
 class SE3:
