@@ -144,15 +144,17 @@ class SE3:
         maxX = 10
         minY = 0
         maxY = 10
-        minZ = 0
+        minZ = 0.317
         maxZ = 3
         while True:
             x = random.uniform(minX, maxX)
             y = random.uniform(minY, maxY)
             z = random.uniform(minZ, maxZ)
-            if ground:
-                z=0
             q = Q.random()
+            if ground:
+                z=0.317
+                q = tf.transformations.quaternion_from_euler(0,0,random.random())
+                q = Q(q.item(0),q.item(1),q.item(2),q.item(3))
             state = SE3(x,y,z,q)
             T, R = state.get_transition_rotation()
             if not pqp_client(T,R).result:
@@ -205,10 +207,16 @@ class Node:
     def __leq__(self, other):
         return self.f < other.f
 
+    def __str__(self):
+        return str(self.data)
+
 class Edge:
     def __init__(self, neighbor, cost):
         self.neighbor = neighbor
         self.cost = cost
+
+    def __str__(self):
+        return str(self.neighbor.data) + '\t' + str(self.cost)
 
 class Graph:
 
@@ -224,10 +232,11 @@ class Graph:
         if node.id not in self.graph:
             self.graph[node.id] = node
 
+    @staticmethod
     def make_path(prev, cur):
         path = []
         while cur.id in prev:
-            path.insert(0, cur.value)
+            path.insert(0, cur.data)
             cur = prev[cur.id]
         return path
 
@@ -244,7 +253,7 @@ class Graph:
             node = fringe.dequeue()
             if node.data == target.data:
                 print dist[node.id]
-                return make_path(prev, node)
+                return Graph.make_path(prev, node)
             closed[node.id] = node
             for edge in node.neighbors:
                 neighbor = edge.neighbor
