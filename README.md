@@ -13,7 +13,7 @@
 
 2. cd $HOME/catkin_ws/src/comprobfall2018-hw2/piano/piano_gazebo/world
 
-3. gazebo environment_piano.world
+3. rosrun gazebo_ros gazebo environment_piano.world
 
 
 
