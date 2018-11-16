@@ -88,8 +88,6 @@ class SE2:
             if not collision:
         '''
 
-
-
 class SE3:
     def __init__(self,x,y,z,q):
         self.X = x
@@ -209,13 +207,13 @@ class Graph:
         self.graph = {}
 
     def addNeighbor(self, node, neighbor, cost):
-        if self.graph[node.id_count] is None:
-            self.graph[node.id_count] = node
+        if self.graph[node.id] is None:
+            self.graph[node.id] = node
         node.neighbors.append(Edge(neighbor, cost))
 
     def addVertex(self, node):
-        if self.graph[node.id_count] is None:
-            self.graph[node.id_count] = node
+        if self.graph[node.id] is None:
+            self.graph[node.id] = node
 
     def buildNeighbor(self):
         return
