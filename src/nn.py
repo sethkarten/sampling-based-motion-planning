@@ -35,14 +35,24 @@ class nearestNeighbor:
                 toRemove.append(j)
         toRemove.reverse()
         for i in toRemove:
+<<<<<<< HEAD
             print "deleting",i
+=======
+>>>>>>> b920aad9e8201f1920246198e3591685842b7d02
             del distances[0][i]
             del indices[0][i]
         for j in range(0,len(indices)):
             indices[0][j] = SE3.repack(self.values[indices[0][j]])
+<<<<<<< HEAD
         print "done query"
         return indices, distances
 
+=======
+        if (len(indices[0]) > k):
+            del indices[0][k]
+            del distances[0][k]
+        return indices[0],distances[0]
+>>>>>>> b920aad9e8201f1920246198e3591685842b7d02
 if __name__ == "__main__":
     newg = nearestNeighbor()
     list = []
