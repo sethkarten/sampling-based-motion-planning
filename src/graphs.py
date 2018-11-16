@@ -120,6 +120,10 @@ class SE3:
         q = Q(data[3],data[4],data[5],data[6])
         return SE3(x,y,z,Q(q))
 
+    def __str__(self):
+        quaternstring = self.q.__str__()
+        totalstr = str(self.X) + " " + str(self.Y) + " " + str(self.Z) + " " + quaternstring
+        return totalstr
     @staticmethod
     def distance(a, b):
         return Q.sym_distance(a.q, b.q) + SE3.euclid_dist(a, b)
@@ -134,7 +138,7 @@ class SE3:
         return T, R
 
     @staticmethod
-    def get_random_state():
+    def get_random_state(ground=False):
         minX = 0
         maxX = 10
         minY = 0
@@ -145,6 +149,8 @@ class SE3:
             x = random.uniform(minX, maxX)
             y = random.uniform(minY, maxY)
             z = random.uniform(minZ, maxZ)
+            if ground:
+                z=0
             q = Q.random()
             state = SE3(x,y,z,q)
             T, R = state.get_transition_rotation()
@@ -225,13 +231,13 @@ class Graph:
             cur = prev[cur.id]
         return path
 
-    def AStarPath(start, target, d=SE3.distance, h=SE3.distance):
+    def AStarPath(start, target, h=SE3.distance):
         global PRECISION_DIGITS
         prev = {}               # Previous node in optimal path from source
         dist = {}               # Unknown distance from source to v
         closed = {}
         dist[start.id] = 0      # Distance from source to source
-        start.f = h(start, target)
+        start.f = h(start.data, target.data)
         fringe = PriorityQueue()
         fringe.enqueue(start)
         while not fringe.empty():
@@ -240,10 +246,11 @@ class Graph:
                 print dist[node.id]
                 return make_path(prev, node)
             closed[node.id] = node
-            for neighbor in node.neighbors:
+            for edge in node.neighbors:
+                neighbor = edge.neighbor
                 if neighbor.id in closed:
                     continue
-                new_g = round(d(node.data, neighbor.data) + dist[node.id], PRECISION_DIGITS)
+                new_g = round(edge.cost + dist[node.id], PRECISION_DIGITS)
                 if neighbor.id in dist:
                     if new_g >= dist[neighbor.id]:
                         continue
