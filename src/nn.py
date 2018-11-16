@@ -25,13 +25,29 @@ class nearestNeighbor:
         self.tree = sk.BallTree(arr,metric=se3Dist)
 
     def query_k_nearest(self,point,k):
-        return self.tree.query(point,k,return_distance=False)
-
+        distances,indices = self.tree.query([point.unpack()],min(k+1,self.pointCount),return_distance=True)
+        distances = np.ndarray.tolist(distances)
+        indices = np.ndarray.tolist(indices)
+        toRemove = []
+        for j in range (0,len(distances[0])):
+            tmp = distances[0][j]
+            if (abs(tmp) <= .0000001):
+                toRemove.append(j)
+        toRemove.reverse()
+        for i in toRemove:
+            print "deleting",i
+            del distances[0][i]
+            del indices[0][i]
+        for j in range(0,len(indices)):
+            indices[0][j] = SE3.repack(self.values[indices[0][j]])
+        print "done query"
+        return indices,distances
 if __name__ == "__main__":
     newg = nearestNeighbor()
     list = []
     for i in range(0,100):
         print i
+        print "getting rand"
         tmp = SE3.get_random_state()
         print tmp.q
         list.append(tmp)
@@ -40,4 +56,5 @@ if __name__ == "__main__":
     newg.buildTree()
     print newg.values[0]
     print newg.values[1]
-    print newg.query_k_nearest([newg.values[0]],2)
+    print "query"
+    print newg.query_k_nearest(list[0],2)

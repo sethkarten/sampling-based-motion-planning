@@ -117,6 +117,10 @@ class SE3:
         q = Q(data[3],data[4],data[5],data[6])
         return SE3(x,y,z,Q(q))
 
+    def __str__(self):
+        quaternstring = self.q.__str__()
+        totalstr = str(self.X) + " " + str(self.Y) + " " + str(self.Z) + " " + quaternstring
+        return totalstr
     @staticmethod
     def distance(a, b):
         return Q.sym_distance(a.q, b.q) + SE3.euclid_dist(a, b)
