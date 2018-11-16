@@ -5,6 +5,7 @@ import sys, random
 from heapq import heappush, heappop
 sys.path.insert(0, '../../pqp_server/pyscript')
 from pqp_ros_client import pqp_client
+from Parameters import *
 import tf, numpy as np
 
 PRECISION_DIGITS = 5
@@ -165,7 +166,6 @@ class SE3:
     '''
     @staticmethod
     def check_collide(a, b):
-        inc = 0.1
         x_inc = b.X - a.X
         y_inc = b.Y - a.Y
         z_inc = b.Z - a.Z
@@ -173,8 +173,7 @@ class SE3:
         x_inc = x_inc / mag * inc
         y_inc = y_inc / mag * inc
         z_inc = z_inc / mag * inc
-        steps = mag / ((x_inc+y_inc+z_inc)/3)
-        steering_inc = 0.03
+
         x = a.X
         y = a.Y
         z = a.Z
@@ -193,6 +192,9 @@ class SE3:
             if fabs(Q.sym_distance(q, b.q)) > steering_inc:
                 q = Q.slerp(q, b.q, amount=steering_inc)
             cur = SE3(x, y, z, q)
+        T, R = cur.get_transition_rotation()
+        if pqp_client(T, R).result:
+            return False
         return True
 
 

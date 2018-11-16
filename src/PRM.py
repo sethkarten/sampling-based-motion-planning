@@ -12,11 +12,17 @@ class PRM:
         nn = nearestNeighbor()
         self.roadmap = Graph()
         for i in range(samples):
+            print "getting sample "+str(i)
             new_state = SE3.get_random_state()
             self.roadmap.addVertex(Node(new_state))
             nn.addPoint(new_state)
+        print "Building tree"
         nn.buildTree()
-        for node in self.roadmap.graph.values():
+        print "Adding Edges"
+
+        for j in range(len(self.roadmap.graph.values())):
+            print "Node "+str(j)
+            node = self.roadmap.graph.values()[j]
             neighbors, distances = nn.query_k_nearest(node.data, k)
             for neighbor, cost in zip(neighbors, distances):
                 string_neigh = str(neighbor)
@@ -41,13 +47,14 @@ class PRM:
 
 if __name__ == '__main__':
     k = 3
-
+    numsamples = 50
     map = PRM()
-    nn = map.build_roadmap(k, samples = 50)
+
+    nn = map.build_roadmap(k, samples = numsamples)
     start = Node(SE3.get_random_state(ground=True))
     goal = Node(SE3.get_random_state(ground=True))
     map.add_points(start, goal, nn, k)
-    print start, goal
+    print "Start: "+str(start), "Goal: "+str(goal)
 
     path = map.roadmap.AStarPath(start, goal)
     path_s = []

@@ -7,6 +7,7 @@ from random import uniform
 from graphs import SE3
 from math import sqrt, fabs, pi
 from time import sleep
+from Parameters import *
 import tf
 
 class PianoControl:
@@ -52,7 +53,7 @@ class PianoControl:
          current_model_state.pose.orientation.z, current_model_state.pose.orientation.w)
         a = SE3(current_model_state.pose.position.x, current_model_state.pose.position.y,\
          current_model_state.pose.position.z, quat)
-        inc = 0.1
+
         x_inc = b.X - a.X
         y_inc = b.Y - a.Y
         z_inc = b.Z - a.Z
@@ -60,8 +61,7 @@ class PianoControl:
         x_inc = x_inc / mag * inc
         y_inc = y_inc / mag * inc
         z_inc = z_inc / mag * inc
-        steps = mag / ((x_inc+y_inc+z_inc)/3)
-        steering_inc = 0.03
+
         x = a.X
         y = a.Y
         z = a.Z
