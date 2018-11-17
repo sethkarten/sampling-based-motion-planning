@@ -16,7 +16,7 @@ class RRT:
         self.nng = nearestNeighbor(se2 = True)
         self.i = 0
 
-    def build(self, samples=350):
+    def build(self, samples=200):
         q_start = SE2(-8, -6.5, 3.14/2.0)
         q_start_node = Node(q_start)
         self.start = q_start_node
@@ -31,6 +31,7 @@ class RRT:
         self.connect()
 
     def extend(self, q_rand):
+        '''FUTURE: choose random 1 of k closest to propagate towards'''
         q_near = self.nng.query_k_nearest(q_rand, 1)[0][0]
         #print q_near
         min_dist = sys.maxint
@@ -66,12 +67,20 @@ class RRT:
         self.build(samples=100)
 
     def print_roadmap(self):
-        V = []
+        Vx = []
+        Vy = []
         E = []
         for node in self.roadmap.graph.items():
-            V.append(node.data)
+            Vx.append(node.data.X)
+            Vy.append(node.data.Y)
             for n in node.neighbors:
-                E.append(n)
+                E.append([(node.data.X, node.data.Y), (n.data.X, n.data.Y)])
+        fig, ax = pl.subplots()
+        lc = mc.LineCollection(E, color='red')
+        ax.add_collection(lc)
+        plt.scatter(Vx,Vy,color='blue')
+        fig.tight_layout()
+        plt.show()
 
 
 
@@ -79,7 +88,7 @@ if __name__ == "__main__":
     mouseBot = AckermannControl()
     map = RRT(mouseBot)
     map.build()
-    #map.print_roadmap()
+    map.print_roadmap()
     print map.start.neighbors
     print map.goal.neighbors
     raw_input('Start A*?')
@@ -92,8 +101,9 @@ if __name__ == "__main__":
         path_s.append(str(s))
     print path_s
 
-    qs = map.start
+    qs = map.start.data
     mouseBot.set_model_state(qs.X, qs.Y, qs.theta, vx=qs.vx, vy=qs.vy, vs=qs.vs)
     for q in path:
         print q
+        q = q.data
         mouseBot.set_model_state(q.X, q.Y, q.theta, vx=q.vx, vy=q.vy, vs=q.vs)
