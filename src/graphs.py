@@ -15,20 +15,27 @@ random.seed(time.time())
 PRECISION_DIGITS = 5
 
 class SE2:
-    def __init__(self, x, y, s):
+    def __init__(self, x, y, s, vx=0, vy=0, vs=0):
         self.X = x
         self.Y = y
         self.theta = s
+        self.vx = vx
+        self.vy = vy
+        self.vs = vs
 
 
     def __eq__(self, other):
         return self.X == other.X and self.Y == other.Y\
-         and self.theta == other.theta
+         and self.theta == other.theta and self.vs == other.vs\
+         and self.vy == other.vy and self.vs == other.vs
 
     def __str__(self):
         return str(round(self.X, PRECISION_DIGITS)) + " " +\
         str(round(self.Y, PRECISION_DIGITS)) + " " +\
-        str(round(self.theta, PRECISION_DIGITS))
+        str(round(self.theta, PRECISION_DIGITS)) + " "+\
+        str(round(self.vx, PRECISION_DIGITS)) + " " +\
+        str(round(self.vy, PRECISION_DIGITS)) + " " +\
+        str(round(self.vs, PRECISION_DIGITS))
 
     @staticmethod
     def distance(a, b):

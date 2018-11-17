@@ -45,3 +45,7 @@ class RRT:
             q_new = self.extend(q_goal)
             if SE2.euclid_dist(q_new, q_goal) < 0.5:
                 break
+
+if __name__ == "__main__":
+    map = RRT()
+    
