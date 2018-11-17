@@ -75,15 +75,15 @@ class SE2:
 
     @staticmethod
     def get_random_control():
-        linVelMin = 0
-        linVelMax = 17.8816
+        linVelMin = 10
+        linVelMax = 50
         steerVelMin = -244.8696
         steerVelMax = 244.8696
         # sample controls
         linVel = random.uniform(linVelMin, linVelMax)
         steerVel = random.uniform(steerVelMin, steerVelMax)
-        time = random.randint(1.0,5.0)
-        return [linVel, steerVel]
+        time = random.randint(1.0,8.0)
+        return linVel, steerVel, time
 
 
 class SE3:

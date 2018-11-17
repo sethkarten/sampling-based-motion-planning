@@ -12,7 +12,7 @@ class RRT:
         self.nng = nearestNeighbor(se2 = True)
 
     def build(self, samples=50):
-        q_start = SE2(-8, -6.5, 0)
+        q_start = SE2(-8, -6.5, 3.14/2.0)
         q_start_node = Node(q_start)
         self.start = q_start_node
         self.roadmap.addVertex(q_start_node)
@@ -24,18 +24,20 @@ class RRT:
         self.connect()
 
     def extend(self, q_rand):
-        q_near = self.nng.query_k_nearest(q_rand, 1)
+        q_near = self.nng.query_k_nearest(q_rand, 1)[0][0]
+        print q_near
         min_dist = sys.maxint
         # chose closest control
-        for i in range(10):
+        for i in range(2):
             q_new = self.mouseBot.get_new_state(q_near)
             if SE2.euclid_dist(q_new, q_rand) < min_dist:
                 q_new_best = q_new
         new_node = Node(q_new_best)
         self.roadmap.addVertex(new_node)
         old_node = self.roadmap.graph[str(q_near)]
-        self.roadmap.addNeighbor(old_node, new_node)
-        self.roadmap.addNeighbor(new_node, old_node)
+        cost = SE2.distance(q_new_best, q_near)
+        self.roadmap.addNeighbor(old_node, new_node, cost)
+        self.roadmap.addNeighbor(new_node, old_node, cost)
         self.nng.addPoint(q_new_best)
         self.nng.buildTree()
         return q_new_best
