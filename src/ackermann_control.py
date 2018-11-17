@@ -21,7 +21,7 @@ class AckermannControl:
         rospy.wait_for_service("/gazebo/set_model_state")
         self.set_model_state = rospy.ServiceProxy("/gazebo/set_model_state", SetModelState)
 
-    def set_state(self, x, y):
+    def set_state(self, x, y, s):
         model_state_resp = self.get_model_state(model_name="ackermann_vehicle")
         model_state = SetModelState()
         model_state.model_name = "ackermann_vehicle"
@@ -30,7 +30,7 @@ class AckermannControl:
         model_state.reference_frame = "world"
         model_state.pose.position.x = x
         model_state.pose.position.y = y
-        quat = tf.transformations.quaternion_from_euler(0,0,0)
+        quat = tf.transformations.quaternion_from_euler(0,0,s)
         model_state.pose.orientation.x = quat[0]
         model_state.pose.orientation.y = quat[1]
         model_state.pose.orientation.z = quat[2]
@@ -40,11 +40,36 @@ class AckermannControl:
         model_state.twist.angular.z = 0
         self.set_model_state(model_state=model_state)
 
-    def control(self, lin_v, ang_v):
-        msg = AckermannDrive()
-        msg.speed = lin_v
-        msg.steering_angle_velocity = ang_v
-        self.ctrl.publish(msg)
+    def execute_control(self, lin_v, ang_v, time=1):
+        while time > 0:
+            msg = AckermannDrive()
+            msg.speed = lin_v
+            msg.steering_angle_velocity = ang_v
+            self.ctrl.publish(msg)
+            time -= 1
+            sleep(2)
+
+    def get_new_state(self, state):
+        self.set_state(state.x, state.y, state.theta)
+
+        linVel, steerVel = SE2.get_random_control()
+        self.execute_control(linVel, steerVel)
+
+        new_state = self.get_model_state(model_name="ackermann_vehicle")
+        new_pose, new_twist = new_state.pose, new_state.twist
+        quat = tf.transformations.random_quaternion()
+        quat[0] = new_pose.orientation.x
+        quat[1] = new_pose.orientation.y
+        quat[2] = new_pose.orientation.z
+        quat[3] = new_pose.orientation.w
+        s = tf.transformations.euler_from_quaternion(quat)
+        x = new_pose.position.x
+        y = new_pose.position.y
+
+        self.set_state(state.x, state.y, state.theta)
+
+        return SE2(x,y,s)
+
 
 if __name__ == "__main__":
     mouseBot = AckermannControl()

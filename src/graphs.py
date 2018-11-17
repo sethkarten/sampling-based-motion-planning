@@ -25,6 +25,11 @@ class SE2:
         return self.X == other.X and self.Y == other.Y\
          and self.theta == other.theta
 
+    def __str__(self):
+        return str(round(self.X, PRECISION_DIGITS)) + " " +\
+        str(round(self.Y, PRECISION_DIGITS)) + " " +\
+        str(round(self.theta, PRECISION_DIGITS))
+
     @staticmethod
     def distance(a, b):
         return fabs(a.theta - other.theta) + euclid_dist(a, b)
@@ -34,11 +39,7 @@ class SE2:
         return sqrt((a.X - b.X)*(a.X - b.X) + (a.Y - b.Y)*(a.Y - b.Y))
 
     @staticmethod
-    def get_random_state():
-        minX = -9
-        maxX = 10
-        minY = -7.5
-        maxY = 6.5
+    def get_random_state(minX = -9, maxX = 10, minY = -7.5, maxY = 6.5):
         x = random.uniform(minX, maxX)
         y = random.uniform(minY, maxY)
         s = random.uniform(0, 2*pi)
@@ -68,7 +69,7 @@ class SE2:
         # sample controls
         linVel = random.uniform(linVelMin, linVelMax)
         steerVel = random.uniform(steerVelMin, steerVelMax)
-        #time = random.uniform(0.0,1.0)
+        time = random.randint(1.0,5.0)
         return [linVel, steerVel]
 
 
