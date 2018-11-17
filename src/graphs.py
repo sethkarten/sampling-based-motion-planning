@@ -15,14 +15,13 @@ random.seed(time.time())
 PRECISION_DIGITS = 5
 
 class SE2:
-    def __init__(self, x, y, s, vx=0, vy=0, vs=0):
+    def __init__(self, x, y, s, vx=0.0, vy=0.0, vs=0.0):
         self.X = x
         self.Y = y
         self.theta = s
         self.vx = vx
         self.vy = vy
         self.vs = vs
-
 
     def __eq__(self, other):
         return self.X == other.X and self.Y == other.Y\

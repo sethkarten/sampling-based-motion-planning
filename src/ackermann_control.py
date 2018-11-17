@@ -50,7 +50,7 @@ class AckermannControl:
             sleep(2)
 
     def get_new_state(self, state):
-        self.set_state(state.x, state.y, state.theta, state.vx, state.vy, state.vs)
+        self.set_state(state.X, state.Y, state.theta, state.vx, state.vy, state.vs)
 
         linVel, steerVel = SE2.get_random_control()
         self.execute_control(linVel, steerVel)
@@ -66,7 +66,7 @@ class AckermannControl:
         x = new_pose.position.x
         y = new_pose.position.y
 
-        self.set_state(state.x, state.y, state.theta, state.vx, state.vy, state.vs)
+        self.set_state(state.X, state.Y, state.theta, state.vx, state.vy, state.vs)
 
         return SE2(x,y,s)
 

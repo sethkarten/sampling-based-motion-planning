@@ -19,11 +19,15 @@ se2Dist = sk.DistanceMetric.get_metric(se2DistFunc)
 
 
 class nearestNeighbor:
-    def __init__(self,metric = se3Dist,repack = SE3.repack):
+    def __init__(self,metric = se3Dist,repack = SE3.repack, se2 = False):
+        if se2:
+            metric = se2Dist
+            repack = SE2.repack
         self.values = []
         self.pointCount = 0
         self.metric = metric
         self.repack = repack
+        self.se2 = se2
 
     def addPoint(self,point):
         self.values.append(point.unpack())
@@ -31,7 +35,10 @@ class nearestNeighbor:
 
     def buildTree(self):
         arr = np.array(self.values)
-        arr = np.reshape(arr,[-1,7])
+        if self.se2:
+            arr = np.reshape(arr, [-1, 6])
+        else:
+            arr = np.reshape(arr,[-1,7])
         self.tree = sk.BallTree(arr,metric=self.metric)
 
     def query_k_nearest(self,point,k):
