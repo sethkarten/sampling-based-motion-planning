@@ -52,8 +52,8 @@ class AckermannControl:
     def get_new_state(self, state):
         self.set_state(state.X, state.Y, state.theta, state.vx, state.vy, state.vs)
 
-        linVel, steerVel = SE2.get_random_control()
-        self.execute_control(linVel, steerVel)
+        linVel, steerVel, time = SE2.get_random_control()
+        self.execute_control(linVel, steerVel, time=time)
 
         new_state = self.get_model_state(model_name="ackermann_vehicle")
         new_pose, new_twist = new_state.pose, new_state.twist
@@ -62,7 +62,7 @@ class AckermannControl:
         quat[1] = new_pose.orientation.y
         quat[2] = new_pose.orientation.z
         quat[3] = new_pose.orientation.w
-        s = tf.transformations.euler_from_quaternion(quat)
+        s = tf.transformations.euler_from_quaternion(quat)[2]
         x = new_pose.position.x
         y = new_pose.position.y
 
@@ -73,13 +73,13 @@ class AckermannControl:
 
 if __name__ == "__main__":
     mouseBot = AckermannControl()
-    mouseBot.control(50, 50)
+    mouseBot.execute_control(50, 50)
     sleep(2)
-    mouseBot.set_state(3, -5)
+    mouseBot.set_state(3, -5, 0)
     for i in range(1000):
-        vel = SE2.get_random_control()
+        linVel, steerVel, time = SE2.get_random_control()
         print vel[0], vel[1]
-        mouseBot.control(vel[0], vel[1])
+        mouseBot.control(linVel, steerVel, time)
         sleep(2)
         print mouseBot.get_model_state(model_name="ackermann_vehicle")
         sleep(2)
