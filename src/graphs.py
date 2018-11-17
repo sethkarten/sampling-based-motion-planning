@@ -38,7 +38,7 @@ class SE2:
 
     @staticmethod
     def distance(a, b):
-        return fabs(a.theta - b.theta) + SE2.euclid_dist(a, b)
+        return SE2.euclid_dist(a, b)
 
     @staticmethod
     def euclid_dist(a, b):
@@ -77,8 +77,8 @@ class SE2:
     def get_random_control():
         linVelMin = -100
         linVelMax = 100
-        steerVelMin = -50  #-244.8696
-        steerVelMax = 50   #244.8696
+        steerVelMin = -10  #-244.8696
+        steerVelMax = 10   #244.8696
         # sample controls
         linVel = random.uniform(linVelMin, linVelMax)
         steerVel = random.uniform(steerVelMin, steerVelMax)
