@@ -6,14 +6,15 @@ from time import sleep
 import sys
 
 class RRT:
-    def __init__(self):
+    def __init__(self, bot):
         self.roadmap = Graph()
-        self.mouseBot = AckermannControl()
+        self.mouseBot = bot
         self.nng = nearestNeighbor(metric=se2Dist, SE2.repack)
 
     def build(self, samples=50):
         q_start = SE2(-8, -6.5, 0)
         q_start_node = Node(q_start)
+        self.start = q_start_node
         self.roadmap.graph.addVertex(q_start_node)
         self.nng.addPoint(q_start)
         self.nng.buildTree()
@@ -41,11 +42,31 @@ class RRT:
 
     def connect(self):
         q_goal = SE2(9, 5.5, 0)
+        q_goal_node = Node(q_goal)
+        self.goal = q_goal_node
+        self.roadmap.graph.addVertex(q_goal_node)
         while True:
             q_new = self.extend(q_goal)
             if SE2.euclid_dist(q_new, q_goal) < 0.5:
                 break
 
 if __name__ == "__main__":
-    map = RRT()
-    
+    mouseBot = AckermannControl()
+    map = RRT(mouseBot)
+    map.build()
+
+    raw_input('Start A*?')
+    path = map.roadmap.AStarPath(map.start, map.goal, h=SE2.distance)
+    if path == None:
+        sys.exit()
+
+    path_s = []
+    for s in path:
+        path_s.append(str(s))
+    print path_s
+
+    qs = map.start
+    mouseBot.set_model_state(qs.x, qs.y, qs.theta, vx=qs.vx, vy=qs.vy, vs=qs.vs)
+    for q in path:
+        print q
+        mouseBot.set_model_state(q.x, q.y, q.theta, vx=q.vx, vy=q.vy, vs=q.vs)

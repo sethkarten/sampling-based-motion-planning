@@ -21,7 +21,7 @@ class AckermannControl:
         rospy.wait_for_service("/gazebo/set_model_state")
         self.set_model_state = rospy.ServiceProxy("/gazebo/set_model_state", SetModelState)
 
-    def set_state(self, x, y, s):
+    def set_state(self, x, y, s, vx=0, vy=0, vs=0):
         model_state_resp = self.get_model_state(model_name="ackermann_vehicle")
         model_state = SetModelState()
         model_state.model_name = "ackermann_vehicle"
@@ -35,9 +35,9 @@ class AckermannControl:
         model_state.pose.orientation.y = quat[1]
         model_state.pose.orientation.z = quat[2]
         model_state.pose.orientation.w = quat[3]
-        model_state.twist.linear.x = 0
-        model_state.twist.linear.y = 0
-        model_state.twist.angular.z = 0
+        model_state.twist.linear.x = vx
+        model_state.twist.linear.y = vy
+        model_state.twist.angular.z = vs
         self.set_model_state(model_state=model_state)
 
     def execute_control(self, lin_v, ang_v, time=1):
@@ -50,7 +50,7 @@ class AckermannControl:
             sleep(2)
 
     def get_new_state(self, state):
-        self.set_state(state.x, state.y, state.theta)
+        self.set_state(state.x, state.y, state.theta, state.vx, state.vy, state.vs)
 
         linVel, steerVel = SE2.get_random_control()
         self.execute_control(linVel, steerVel)
@@ -66,7 +66,7 @@ class AckermannControl:
         x = new_pose.position.x
         y = new_pose.position.y
 
-        self.set_state(state.x, state.y, state.theta)
+        self.set_state(state.x, state.y, state.theta, state.vx, state.vy, state.vs)
 
         return SE2(x,y,s)
 
