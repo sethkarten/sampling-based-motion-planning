@@ -47,7 +47,7 @@ class AckermannControl:
             msg.steering_angle_velocity = ang_v
             self.ctrl.publish(msg)
             time -= 1
-            sleep(2)
+            sleep(.8)
 
     def get_new_state(self, state):
         self.set_state(state.X, state.Y, state.theta, state.vx, state.vy, state.vs)
