@@ -9,26 +9,26 @@ class RRT:
     def __init__(self, bot):
         self.roadmap = Graph()
         self.mouseBot = bot
-        self.nng = nearestNeighbor(metric=se2Dist, SE2.repack)
+        self.nng = nearestNeighbor(se2 = True)
 
     def build(self, samples=50):
         q_start = SE2(-8, -6.5, 0)
         q_start_node = Node(q_start)
         self.start = q_start_node
-        self.roadmap.graph.addVertex(q_start_node)
+        self.roadmap.addVertex(q_start_node)
         self.nng.addPoint(q_start)
         self.nng.buildTree()
-        for i in range(len(samples)):
+        for i in range(samples):
             q_rand = SE2.get_random_state()
             self.extend(q_rand)
         self.connect()
 
     def extend(self, q_rand):
-        q_near = self.nn_start.query_k_nearest(q_rand, 1)
+        q_near = self.nng.query_k_nearest(q_rand, 1)
         min_dist = sys.maxint
         # chose closest control
         for i in range(10):
-            q_new = self.mouseBot.get_new_state(q_rand)
+            q_new = self.mouseBot.get_new_state(q_near)
             if SE2.euclid_dist(q_new, q_rand) < min_dist:
                 q_new_best = q_new
         new_node = Node(q_new_best)
@@ -44,7 +44,7 @@ class RRT:
         q_goal = SE2(9, 5.5, 0)
         q_goal_node = Node(q_goal)
         self.goal = q_goal_node
-        self.roadmap.graph.addVertex(q_goal_node)
+        self.roadmap.addVertex(q_goal_node)
         while True:
             q_new = self.extend(q_goal)
             if SE2.euclid_dist(q_new, q_goal) < 0.5:
