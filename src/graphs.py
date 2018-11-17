@@ -190,7 +190,7 @@ class SE3:
             if fabs(Q.sym_distance(q, b.q)) > steering_inc:
                 q = Q.slerp(q, b.q, amount=steering_inc)
             cur = SE3(x, y, z, q)
-        T, R = cur.get_transition_rotation()
+        T, R = cur. get_transition_rotation()
         if pqp_client(T, R).result:
             return False
         T, R = b.get_transition_rotation()
@@ -255,7 +255,6 @@ class Graph:
         while not fringe.is_empty():
             node = fringe.dequeue()
             if node.data == target.data:
-                print dist[node.id]
                 return Graph.make_path(prev, node)
             closed[node.id] = node
             for edge in node.neighbors:
