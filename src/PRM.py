@@ -3,12 +3,12 @@ from graphs import *
 from nn import nearestNeighbor
 from piano_control import PianoControl
 from time import sleep
-
+import math
 class PRM:
     def __init__(self):
         self.roadmap = Graph()
 
-    def build_roadmap(self, k, samples=100):
+    def build_connected_roadmap(self, k=3, samples=100):
         nn = nearestNeighbor()
         self.roadmap = Graph()
         for i in range(samples):
@@ -20,9 +20,34 @@ class PRM:
         nn.buildTree()
         print "Adding Edges"
 
-        for j in range(len(self.roadmap.graph.values())):
-            print "Node "+str(j)
-            node = self.roadmap.graph.values()[j]
+        count = 0
+        for node in self.roadmap.graph.values():
+            print count+1
+            neighbors, distances = nn.query_k_nearest(node.data, k)
+            for neighbor, cost in zip(neighbors, distances):
+                string_neigh = str(neighbor)
+                neighbor = self.roadmap.graph[string_neigh]
+                if self.roadmap.AStarPath(node, neighbor) is None:
+                    if SE3.check_collide(node.data, neighbor.data):
+                        self.roadmap.addNeighbor(node, neighbor, cost)
+                        self.roadmap.addNeighbor(neighbor, node, cost)
+            count += 1
+        return nn
+
+    def build_dense_roadmap(self, k=3, samples=100):
+        nn = nearestNeighbor()
+        self.roadmap = Graph()
+        for i in range(samples):
+            print "getting sample "+str(i)
+            new_state = SE3.get_random_state()
+            self.roadmap.addVertex(Node(new_state))
+            nn.addPoint(new_state)
+        print "Building tree"
+        nn.buildTree()
+        print "Adding Edges"
+        count = 0
+        for node in self.roadmap.graph.values():
+            print count+1
             neighbors, distances = nn.query_k_nearest(node.data, k)
             for neighbor, cost in zip(neighbors, distances):
                 string_neigh = str(neighbor)
@@ -30,7 +55,37 @@ class PRM:
                 if SE3.check_collide(node.data, neighbor.data):
                     self.roadmap.addNeighbor(node, neighbor, cost)
                     self.roadmap.addNeighbor(neighbor, node, cost)
+            count+=1
         return nn
+
+    def build_prmstar_roadmap(self,dimensionality = 7,samples=100):
+        nn = nearestNeighbor()
+        self.roadmap = Graph()
+        for i in range(samples):
+            print "getting sample "+str(i)
+            new_state = SE3.get_random_state()
+            self.roadmap.addVertex(Node(new_state))
+            nn.addPoint(new_state)
+        print "Building tree"
+        nn.buildTree()
+        print "Adding Edges"
+
+        count = 0
+        for node in self.roadmap.graph.values():
+            k = 0
+            print count+1
+            if (count != 0):
+                k = int(math.ceil(math.e * (1 + (1.0/dimensionality))* math.log(count,2) ))
+            neighbors, distances = nn.query_k_nearest(node.data, k)
+            for neighbor, cost in zip(neighbors, distances):
+                string_neigh = str(neighbor)
+                neighbor = self.roadmap.graph[string_neigh]
+                if SE3.check_collide(node.data, neighbor.data):
+                    self.roadmap.addNeighbor(node, neighbor, cost)
+                    self.roadmap.addNeighbor(neighbor, node, cost)
+            count += 1
+        return nn
+
 
     def add_points(self, node1, node2, nn, k):
         for node in [node1, node2]:
@@ -49,7 +104,8 @@ if __name__ == '__main__':
     k = 5
     numsamples = 500
     map = PRM()
-    nn = map.build_roadmap(k, samples = numsamples)
+    print "Building roadmap"
+    nn = map.build_prmstar_roadmap(k, samples = numsamples)
 
     while True:
         text = raw_input('Get new path? Y/N')
