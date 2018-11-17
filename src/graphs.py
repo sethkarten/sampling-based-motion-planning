@@ -30,8 +30,8 @@ class SE2:
          and self.s == other.s
 
     @staticmethod
-    def distance(a, b):
-        return fabs(a.s - other.s) + euclid_dist(a, b)
+    def distance(a, other):
+        return fabs(a.s - other.s) + SE2.euclid_dist(a, b)
 
     @staticmethod
     def euclid_dist(a, b):
@@ -53,15 +53,17 @@ class SE2:
         list = []
         list.append(self.X)
         list.append(self.Y)
-        list.append(self.theta)
+        list.append(self.vLin)
+        list.append(self.vS)
         return np.array(list)
 
     @staticmethod
     def repack(data):
         x = data[0]
         y = data[1]
-        theta = data[2]
-        return SE2(x,y,theta)
+        vLin = data[2]
+        vS = data[3]
+        return SE2(x,y,vLin,vS)
 
     @staticmethod
     def get_random_control():
