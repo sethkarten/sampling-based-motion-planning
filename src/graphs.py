@@ -8,8 +8,6 @@ from pqp_ros_client import pqp_client
 from Parameters import *
 import tf, numpy as np
 
-
-import random
 import time
 random.seed(time.time())
 
@@ -17,12 +15,13 @@ random.seed(time.time())
 PRECISION_DIGITS = 5
 
 class SE2:
-    def __init__(self, x, y, s, vLin, vS):
+    def __init__(self, x, y, s, vx, vy, vs):
         self.X = x
         self.Y = y
         self.s = s
-        self.vLin = vLin
-        self.vS = vS
+        self.vx = vx
+        self.vy = vy
+        self.vs = vs
 
 
     def __eq__(self, other):
@@ -39,7 +38,7 @@ class SE2:
 
     @staticmethod
     def get_random_state():
-        minX = -10
+        minX = -9
         maxX = 10
         minY = -7.5
         maxY = 6.5
