@@ -8,8 +8,6 @@ from pqp_ros_client import pqp_client
 from Parameters import *
 import tf, numpy as np
 
-
-import random
 import time
 random.seed(time.time())
 
@@ -17,32 +15,38 @@ random.seed(time.time())
 PRECISION_DIGITS = 5
 
 class SE2:
-    def __init__(self, x, y, s, vLin, vS):
+    def __init__(self, x, y, s, vx=0, vy=0, vs=0):
         self.X = x
         self.Y = y
-        self.s = s
-        self.vLin = vLin
-        self.vS = vS
+        self.theta = s
+        self.vx = vx
+        self.vy = vy
+        self.vs = vs
 
 
     def __eq__(self, other):
         return self.X == other.X and self.Y == other.Y\
-         and self.s == other.s
+         and self.theta == other.theta and self.vs == other.vs\
+         and self.vy == other.vy and self.vs == other.vs
+
+    def __str__(self):
+        return str(round(self.X, PRECISION_DIGITS)) + " " +\
+        str(round(self.Y, PRECISION_DIGITS)) + " " +\
+        str(round(self.theta, PRECISION_DIGITS)) + " "+\
+        str(round(self.vx, PRECISION_DIGITS)) + " " +\
+        str(round(self.vy, PRECISION_DIGITS)) + " " +\
+        str(round(self.vs, PRECISION_DIGITS))
 
     @staticmethod
-    def distance(a, other):
-        return fabs(a.s - other.s) + SE2.euclid_dist(a, b)
+    def distance(a, b):
+        return fabs(a.theta - b.theta) + SE2.euclid_dist(a, b)
 
     @staticmethod
     def euclid_dist(a, b):
         return sqrt((a.X - b.X)*(a.X - b.X) + (a.Y - b.Y)*(a.Y - b.Y))
 
     @staticmethod
-    def get_random_state():
-        minX = -10
-        maxX = 10
-        minY = -7.5
-        maxY = 6.5
+    def get_random_state(minX = -9, maxX = 10, minY = -7.5, maxY = 6.5):
         x = random.uniform(minX, maxX)
         y = random.uniform(minY, maxY)
         s = random.uniform(0, 2*pi)
@@ -74,7 +78,7 @@ class SE2:
         # sample controls
         linVel = random.uniform(linVelMin, linVelMax)
         steerVel = random.uniform(steerVelMin, steerVelMax)
-        #time = random.uniform(0.0,1.0)
+        time = random.randint(1.0,5.0)
         return [linVel, steerVel]
 
 
