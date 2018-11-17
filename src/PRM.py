@@ -2,8 +2,36 @@
 from graphs import *
 from nn import nearestNeighbor
 from piano_control import PianoControl
-from time import sleep
+from time import *
+import threading
 import math
+
+def add_prm_node(a,b,roadmap,lock,cost):
+    for n in a.neighbors:
+        if str(n.neighbor) == str(b):
+            return True
+    if SE3.check_collide(a.data, b.data):
+        if not lock is None:
+            lock.acquire()
+        roadmap.addNeighbor(a, b, cost)
+        roadmap.addNeighbor(b, a, cost)
+        if not lock is None:
+            lock.release()
+        return True
+    return False
+class CollisionThread(threading.Thread):
+
+    def __init__(self,a,b,roadmap,lock,cost):
+        threading.Thread.__init__(self)
+        self.a = a
+        self.b = b
+        self.roadmap = roadmap
+        self.lock = lock
+        self.cost = cost
+    def run(self):
+        add_prm_node(self.a,self.b,self.roadmap,self.lock,self.cost)
+
+
 class PRM:
     def __init__(self):
         self.roadmap = Graph()
@@ -28,9 +56,8 @@ class PRM:
                 string_neigh = str(neighbor)
                 neighbor = self.roadmap.graph[string_neigh]
                 if self.roadmap.AStarPath(node, neighbor) is None:
-                    if SE3.check_collide(node.data, neighbor.data):
-                        self.roadmap.addNeighbor(node, neighbor, cost)
-                        self.roadmap.addNeighbor(neighbor, node, cost)
+                    if add_prm_node(node,neighbor,self.roadmap,None,cost):
+                        break
             count += 1
         return nn
 
@@ -46,16 +73,20 @@ class PRM:
         nn.buildTree()
         print "Adding Edges"
         count = 0
+        lock = threading.Lock()
         for node in self.roadmap.graph.values():
+            runningthr = []
             print count+1
             neighbors, distances = nn.query_k_nearest(node.data, k)
             for neighbor, cost in zip(neighbors, distances):
                 string_neigh = str(neighbor)
                 neighbor = self.roadmap.graph[string_neigh]
-                if SE3.check_collide(node.data, neighbor.data):
-                    self.roadmap.addNeighbor(node, neighbor, cost)
-                    self.roadmap.addNeighbor(neighbor, node, cost)
+                thr = CollisionThread(node,neighbor,self.roadmap,lock,cost)
+                runningthr.append(thr)
+                thr.start()
             count+=1
+            for t in runningthr:
+                t.join()
         return nn
 
     def build_prmstar_roadmap(self,dimensionality = 7,samples=100):
@@ -71,19 +102,29 @@ class PRM:
         print "Adding Edges"
 
         count = 0
+        lock = threading.Lock()
         for node in self.roadmap.graph.values():
             k = 0
             print count+1
             if (count != 0):
                 k = int(math.ceil(math.e * (1 + (1.0/dimensionality))* math.log(count,2) ))
+            tmp = time()
             neighbors, distances = nn.query_k_nearest(node.data, k)
+            print "nn check took ",time()-tmp,"(found ",len(neighbors)," neighbors)"
+            tmp = time()
+
+            runningthr = []
             for neighbor, cost in zip(neighbors, distances):
                 string_neigh = str(neighbor)
                 neighbor = self.roadmap.graph[string_neigh]
-                if SE3.check_collide(node.data, neighbor.data):
-                    self.roadmap.addNeighbor(node, neighbor, cost)
-                    self.roadmap.addNeighbor(neighbor, node, cost)
+
+                thr = CollisionThread(node,neighbor,self.roadmap,lock,cost)
+                runningthr.append(thr)
+                thr.start()
             count += 1
+            for t in runningthr:
+                t.join()
+            print "col check took",time()-tmp
         return nn
 
 
@@ -102,11 +143,12 @@ class PRM:
 
 if __name__ == '__main__':
     k = 5
-    numsamples = 10
+    numsamples = 1000
     map = PRM()
     print "Building roadmap"
-    nn = map.build_connected_roadmap(k, samples = numsamples)
-
+    nn = map.build_dense_roadmap(samples = numsamples)
+    global TOTAL_TIME_STR
+    print getGlobalTimeStr(), "TOTAL TIME STR"
     while True:
         text = raw_input('Get new path? Y/N')
         if text == 'N':
@@ -114,6 +156,7 @@ if __name__ == '__main__':
         start = Node(SE3.get_random_state(ground=True))
         goal = Node(SE3.get_random_state(ground=True))
         map.add_points(start, goal, nn, k)
+
         print "Start: "+str(start), "Goal: "+str(goal)
 
         path = map.roadmap.AStarPath(start, goal)

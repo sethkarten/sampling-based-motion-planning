@@ -4,6 +4,7 @@ import scipy as sp
 from graphs import SE3,SE2
 import sklearn.neighbors as sk
 
+from time import time
 
 def se3DistFunc(p,q):
     dist = SE3.distance(SE3.repack(p),SE3.repack(q))
@@ -19,9 +20,9 @@ se2Dist = sk.DistanceMetric.get_metric(se2DistFunc)
 
 
 class nearestNeighbor:
-    def __init__(self,metric = se3Dist,repack = SE3.repack, se2 = False):
+    def __init__(self,metric = se3DistFunc,repack = SE3.repack, se2 = False):
         if se2:
-            metric = se2Dist
+            metric = se2DistFunc
             repack = SE2.repack
         self.values = []
         self.pointCount = 0
@@ -39,10 +40,12 @@ class nearestNeighbor:
             arr = np.reshape(arr, [-1, 6])
         else:
             arr = np.reshape(arr,[-1,7])
-        self.tree = sk.BallTree(arr,metric=self.metric)
+        self.nn = sk.NearestNeighbors(n_jobs=-1,algorithm='brute',leaf_size=100,metric=self.metric)
+        self.nn.fit(arr)
+        #self.tree = sk.BallTree(arr,metric=self.metric)
 
     def query_k_nearest(self,point,k):
-        distances,indices = self.tree.query([point.unpack()],min(k+1,self.pointCount),return_distance=True)
+        distances,indices = self.nn.kneighbors([point.unpack()],min(k+1,self.pointCount),return_distance=True)#self.tree.query([point.unpack()],min(k+1,self.pointCount),return_distance=True)
         distances = np.ndarray.tolist(distances)
         indices = np.ndarray.tolist(indices)
         toRemove = []

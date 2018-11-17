@@ -8,12 +8,12 @@ from pqp_ros_client import pqp_client
 from Parameters import *
 import tf, numpy as np
 import pickle
-import time
-random.seed(time.time())
+from time import *
+random.seed(time())
 
 
 PRECISION_DIGITS = 5
-
+TOTAL_TIME_STR = 0
 class SE2:
     def __init__(self, x, y, s, vx=0.0, vy=0.0, vs=0.0):
         self.X = x
@@ -183,24 +183,28 @@ class SE3:
         currlerp = 0
         if pqp_client(T, R).result:
             return False
-        while SE3.euclid_dist(cur, b) > inc\
-        or fabs(Q.sym_distance(cur.q, b.q)) > .1:
+        looping = True
+        while looping:
+            looping = False
             T, R = cur.get_transition_rotation()
+
             if pqp_client(T,R).result:
                 # Collision
                 return False
+
             if SE3.euclid_dist(cur, b) > inc:
+                looping = True
                 cur.X += x_inc
                 cur.Y += y_inc
                 cur.Z += z_inc
             if fabs(Q.sym_distance(cur.q, b.q)) > .1:
+                looping = True
                 cur.q = Q.slerp(a.q, b.q, amount=currlerp)
                 currlerp+=steering_inc
 
         T, R = cur.get_transition_rotation()
         if pqp_client(T, R).result:
             return False
-
         return True
 
 
@@ -216,7 +220,11 @@ class Node:
         return self.f < other.f
 
     def __str__(self):
-        return str(self.data)
+        tmp = time()
+        dat = str(self.data)
+        global TOTAL_TIME_STR
+        TOTAL_TIME_STR += time() - tmp
+        return dat
 
 class Edge:
     def __init__(self, neighbor, cost):
@@ -287,3 +295,7 @@ class PriorityQueue:
 
     def dequeue(self):
         return heappop(self.heap)
+
+def getGlobalTimeStr():
+    global TOTAL_TIME_STR
+    return TOTAL_TIME_STR
