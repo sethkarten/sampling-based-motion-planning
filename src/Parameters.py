@@ -1,2 +1,2 @@
-steering_inc = 0.1
-inc = .1
+steering_inc = 0.25
+inc = .25
