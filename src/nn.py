@@ -7,7 +7,7 @@ import sklearn.neighbors as sk
 from time import time
 
 def se3DistFunc(p,q):
-    dist = SE3.distance(SE3.repack(p),SE3.repack(q))
+    dist = SE3.weighted_distance(SE3.repack(p),SE3.repack(q))
     return dist
 se3Dist = sk.DistanceMetric.get_metric(se3DistFunc)
 

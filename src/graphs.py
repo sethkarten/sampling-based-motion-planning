@@ -127,6 +127,9 @@ class SE3:
 
     @staticmethod
     def distance(a, b):
+        return Q.sym_distance(a.q, b.q) + SE3.euclid_dist(a, b)
+
+    def weighted_distance(a, b):
         return Q.sym_distance(a.q, b.q) + 3*SE3.euclid_dist(a, b)
 
     @staticmethod
