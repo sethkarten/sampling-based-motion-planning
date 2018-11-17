@@ -15,22 +15,19 @@ random.seed(time.time())
 PRECISION_DIGITS = 5
 
 class SE2:
-    def __init__(self, x, y, s, vx, vy, vs):
+    def __init__(self, x, y, s):
         self.X = x
         self.Y = y
-        self.s = s
-        self.vx = vx
-        self.vy = vy
-        self.vs = vs
+        self.theta = s
 
 
     def __eq__(self, other):
         return self.X == other.X and self.Y == other.Y\
-         and self.s == other.s
+         and self.theta == other.theta
 
     @staticmethod
     def distance(a, b):
-        return fabs(a.s - other.s) + euclid_dist(a, b)
+        return fabs(a.theta - other.theta) + euclid_dist(a, b)
 
     @staticmethod
     def euclid_dist(a, b):
@@ -47,6 +44,20 @@ class SE2:
         s = random.uniform(0, 2*pi)
         state = SE2(x, y, s)
         return state
+
+    def unpack(self):
+        list = []
+        list.append(self.X)
+        list.append(self.Y)
+        list.append(self.theta)
+        return np.array(list)
+
+    @staticmethod
+    def repack(data):
+        x = data[0]
+        y = data[1]
+        theta = data[2]
+        return SE2(x,y,theta)
 
     @staticmethod
     def get_random_control():

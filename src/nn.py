@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import numpy as np
 import scipy as sp
-from graphs import SE3
+from graphs import SE3,SE2
 import sklearn.neighbors as sk
 
 
@@ -10,10 +10,20 @@ def se3DistFunc(p,q):
     return dist
 se3Dist = sk.DistanceMetric.get_metric(se3DistFunc)
 
+
+def se2DistFunc(p,q):
+    dist = SE2.distance(SE2.repack(p),SE2.repack(q))
+    return dist
+
+se2Dist = sk.DistanceMetric.get_metric(se2DistFunc)
+
+
 class nearestNeighbor:
-    def __init__(self):
+    def __init__(self,metric = se3Dist,repack = SE3.repack):
         self.values = []
         self.pointCount = 0
+        self.metric = metric
+        self.repack = repack
 
     def addPoint(self,point):
         self.values.append(point.unpack())
@@ -22,7 +32,7 @@ class nearestNeighbor:
     def buildTree(self):
         arr = np.array(self.values)
         arr = np.reshape(arr,[-1,7])
-        self.tree = sk.BallTree(arr,metric=se3Dist)
+        self.tree = sk.BallTree(arr,metric=self.metric)
 
     def query_k_nearest(self,point,k):
         distances,indices = self.tree.query([point.unpack()],min(k+1,self.pointCount),return_distance=True)
@@ -38,7 +48,7 @@ class nearestNeighbor:
             del distances[0][i]
             del indices[0][i]
         for j in range(0,len(indices[0])):
-            indices[0][j] = SE3.repack(self.values[indices[0][j]])
+            indices[0][j] = self.repack(self.values[indices[0][j]])
         if len(indices[0]) > k:
             del indices[0][k]
             del distances[0][k]
