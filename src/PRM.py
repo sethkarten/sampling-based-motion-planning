@@ -13,7 +13,7 @@ class PRM:
         self.roadmap = Graph()
         for i in range(samples):
             print "getting sample "+str(i)
-            new_state = SE3.get_random_state()
+            new_state = SE3.get_random_state(ground=False)
             self.roadmap.addVertex(Node(new_state))
             nn.addPoint(new_state)
         print "Building tree"
@@ -102,10 +102,10 @@ class PRM:
 
 if __name__ == '__main__':
     k = 5
-    numsamples = 500
+    numsamples = 10
     map = PRM()
     print "Building roadmap"
-    nn = map.build_prmstar_roadmap(k, samples = numsamples)
+    nn = map.build_connected_roadmap(k, samples = numsamples)
 
     while True:
         text = raw_input('Get new path? Y/N')
@@ -131,6 +131,6 @@ if __name__ == '__main__':
         rocketPiano.set_steering_angle(start.data.q)
         print start.data
         for state in path:
-            sleep(2)
+            sleep(.01)
             print state
             rocketPiano.interpolate(state)

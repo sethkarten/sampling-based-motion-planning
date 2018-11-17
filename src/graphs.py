@@ -7,7 +7,7 @@ sys.path.insert(0, '../../pqp_server/pyscript')
 from pqp_ros_client import pqp_client
 from Parameters import *
 import tf, numpy as np
-
+import pickle
 import time
 random.seed(time.time())
 
@@ -176,26 +176,31 @@ class SE3:
         y = a.Y
         z = a.Z
         q = a.q
-        cur = a
+
+        cur = SE3(x,y,z,q)
+        T, R = b.get_transition_rotation()
+
+        currlerp = 0
+        if pqp_client(T, R).result:
+            return False
         while SE3.euclid_dist(cur, b) > inc\
-        or fabs(Q.sym_distance(q, b.q)) > steering_inc:
+        or fabs(Q.sym_distance(cur.q, b.q)) > .1:
             T, R = cur.get_transition_rotation()
             if pqp_client(T,R).result:
                 # Collision
                 return False
             if SE3.euclid_dist(cur, b) > inc:
-                x += x_inc
-                y += y_inc
-                z += z_inc
-            if fabs(Q.sym_distance(q, b.q)) > steering_inc:
-                q = Q.slerp(q, b.q, amount=steering_inc)
-            cur = SE3(x, y, z, q)
-        T, R = cur. get_transition_rotation()
+                cur.X += x_inc
+                cur.Y += y_inc
+                cur.Z += z_inc
+            if fabs(Q.sym_distance(cur.q, b.q)) > .1:
+                cur.q = Q.slerp(a.q, b.q, amount=currlerp)
+                currlerp+=steering_inc
+
+        T, R = cur.get_transition_rotation()
         if pqp_client(T, R).result:
             return False
-        T, R = b.get_transition_rotation()
-        if pqp_client(T, R).result:
-            return False
+
         return True
 
 
