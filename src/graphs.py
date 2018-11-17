@@ -57,17 +57,22 @@ class SE2:
         list = []
         list.append(self.X)
         list.append(self.Y)
-        list.append(self.vLin)
-        list.append(self.vS)
+        list.append(self.theta)
+        list.append(self.vx)
+        list.append(self.vy)
+        list.append(self.vs)
         return np.array(list)
 
     @staticmethod
     def repack(data):
-        x = data[0]
-        y = data[1]
-        vLin = data[2]
-        vS = data[3]
-        return SE2(x,y,vLin,vS)
+        X = data[0]
+        Y = data[1]
+        theta = data[2]
+        vx = data[3]
+        vy = data[4]
+        vs = data[5]
+
+        return SE2(X,Y,theta,vx,vy,vs)
 
     @staticmethod
     def get_random_control():
