@@ -143,37 +143,42 @@ class PRM:
 
 if __name__ == '__main__':
     k = 5
-    numsamples = 1000
-    map = PRM()
-    print "Building roadmap"
-    nn = map.build_dense_roadmap(samples = numsamples)
-    global TOTAL_TIME_STR
-    print getGlobalTimeStr(), "TOTAL TIME STR"
-    while True:
-        text = raw_input('Get new path? Y/N')
-        if text == 'N':
-            break
-        start = Node(SE3.get_random_state(ground=True))
-        goal = Node(SE3.get_random_state(ground=True))
-        map.add_points(start, goal, nn, k)
+    numsamples = 100
+    maps = [PRM(),PRM(),PRM()]
+    nns = []
+    nns.append(maps[0].build_connected_roadmap(k,numsamples))
+    nns.append(maps[1].build_dense_roadmap(k,numsamples))
+    nns.append(maps[2].build_prmstar_roadmap(dimensionality=6,samples=numsamples))
+    for map,nn in zip(maps,nns):
+        print "Building roadmap"
+        global TOTAL_TIME_STR
+        print getGlobalTimeStr(), "TOTAL TIME STR"
+        while True:
+            text = raw_input('Get new path? Y/N')
+            if text == 'N':
+                break
+            start = Node(SE3.get_random_state(ground=True))
+            goal = Node(SE3.get_random_state(ground=True))
+            map.add_points(start, goal, nn, k)
 
-        print "Start: "+str(start), "Goal: "+str(goal)
+            print "Start: "+str(start), "Goal: "+str(goal)
 
-        path = map.roadmap.AStarPath(start, goal)
-        if path == None:
-            continue
-        path_s = []
-        for s in path:
-            path_s.append(str(s))
-        print path_s
+            path = map.roadmap.AStarPath(start, goal)
+            if path == None:
+                continue
+            path_s = []
+            for s in path:
+                path_s.append(str(s))
+            print path_s
 
-        raw_input('Start A*?')
+            raw_input('Start A*?')
 
-        rocketPiano = PianoControl()
-        rocketPiano.set_position(start.data)
-        rocketPiano.set_steering_angle(start.data.q)
-        print start.data
-        for state in path:
-            sleep(1)
-            print state
-            rocketPiano.interpolate(state)
+            rocketPiano = PianoControl()
+            rocketPiano.set_position(start.data)
+            rocketPiano.set_steering_angle(start.data.q)
+            print start.data
+            for state in path:
+                sleep(.01)
+                print state
+                rocketPiano.interpolate(state)
+

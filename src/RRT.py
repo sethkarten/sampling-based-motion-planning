@@ -10,12 +10,14 @@ import pylab as pl
 import numpy as np
 
 
+
 class RRT:
     def __init__(self, bot, q_start, q_goal, greedy=False):
         self.roadmap = Graph()
         self.mouseBot = bot
         self.nng = nearestNeighbor(se2 = True)
         self.i = 0
+
         self.greedy = greedy
 
         q_start_node = Node(q_start)
@@ -131,7 +133,6 @@ class RRT:
             lc1 = mc.LineCollection(E_a, color='blue')
             ax.add_collection(lc1)
             plt.scatter(Vx_a, Vy_a, color='orange')
-
         fig.tight_layout()
         plt.show()
 
@@ -158,10 +159,13 @@ if __name__ == "__main__":
             #map = map1
             #map.start, map.goal = map.goal, map.start
             #break
+>>>>>>> d3d663be6d15cf92c513eca9d86048c49554b9a3
         map2 = RRT.merge(map, map1)
         if map2 != None:
             map = map2
             break
+<<<<<<< HEAD
+=======
     '''
     map.print_roadmap()
     print map.start.neighbors
