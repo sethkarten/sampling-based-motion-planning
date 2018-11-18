@@ -32,14 +32,16 @@ class RRT:
     def build(self, samples=125):
         for i in range(samples):
             q_rand = SE2.get_random_state(greedy=self.greedy, goal=self.goal.data)
-            if i % 3  == 0:
+            if i % 5  == 0:
                 q_rand = SE2.get_random_state()
             #if i % 15 == 0:
             #    q_rand = SE2.get_random_state(greedy=True, goal=self.start.data)
             #print q_rand
             new_node = self.extend(q_rand)
-            if SE2.distance(new_node.data, self.goal.data) < 1:
+            if SE2.distance(new_node.data, self.goal.data) < 1.5:
                 return True
+                print new_node.data
+                self.goal = new_node
                 print 'First solution', self.i
 
             #print self.start.neighbors
@@ -158,17 +160,15 @@ if __name__ == "__main__":
             #map = map1
             #map.start, map.goal = map.goal, map.start
             #break
->>>>>>> d3d663be6d15cf92c513eca9d86048c49554b9a3
         map2 = RRT.merge(map, map1)
         if map2 != None:
             map = map2
             break
-<<<<<<< HEAD
-=======
     '''
     map.print_roadmap()
-    print map.start.neighbors
-    print map.goal.neighbors
+    print map.start, map.start.neighbors
+    print map.goal, map.goal.neighbors
+    print map.goal in map.roadmap.graph
     raw_input('Start A*?')
     path = map.roadmap.AStarPath(map.start, map.goal, h=SE2.distance)
     if path == None:
