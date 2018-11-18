@@ -30,14 +30,15 @@ class RRT:
     def build(self, samples=125):
         for i in range(samples):
             q_rand = SE2.get_random_state(greedy=self.greedy, goal=self.goal.data)
-            if i % 3  == 0:
+            if i % 5  == 0:
                 q_rand = SE2.get_random_state()
             #if i % 15 == 0:
             #    q_rand = SE2.get_random_state(greedy=True, goal=self.start.data)
             #print q_rand
             new_node = self.extend(q_rand)
-            if SE2.distance(new_node.data, self.goal.data) < 1:
+            if SE2.distance(new_node.data, self.goal.data) < 1.5:
                 return True
+                self.goal = new_node
                 print 'First solution', self.i
 
             #print self.start.neighbors
