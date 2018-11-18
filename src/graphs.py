@@ -243,12 +243,14 @@ class Node:
         return self.f < other.f
 
     def __str__(self):
-        tmp = time()
-        dat = str(self.data)
-        global TOTAL_TIME_STR
-        TOTAL_TIME_STR += time() - tmp
-        return dat
+        return str(self.data)
 
+    def removeNeighbor(self,node):
+        for i in range(len(self.neighbors)-1,-1,-1):
+            tmp = self.neighbors[i]
+            if tmp.neighbor.id == node.id:
+                del self.neighbors[i]
+                break;
 
 class Edge:
     def __init__(self, neighbor, cost):
@@ -271,6 +273,14 @@ class Graph:
     def addVertex(self, node):
         if node.id not in self.graph:
             self.graph[node.id] = node
+
+    def removeVertex(self, node):
+        if node.id in self.graph:
+            for i in range(len(self.graph[node.id].neighbors)-1,-1,-1):
+                tmp = self.graph[node.id].neighbors[i].neighbor
+                tmp.removeNeighbor(node)
+                del self.graph[node.id].neighbors[i]
+            del self.graph[node.id]
 
     @staticmethod
     def make_path(prev, cur):

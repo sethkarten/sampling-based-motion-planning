@@ -36,14 +36,22 @@ class PRM:
     def __init__(self):
         self.roadmap = Graph()
 
-    def build_connected_roadmap(self, k=3, samples=100):
+    def addToRoadmap(self,nn,point):
+        nn.addPoint(point)
+        self.roadmap.addVertex(Node(point))
+
+    def build_connected_roadmap(self, k=3, samples=100,points = None):
         nn = nearestNeighbor()
         self.roadmap = Graph()
-        for i in range(samples):
-            print "getting sample "+str(i)
-            new_state = SE3.get_random_state(ground=False)
-            self.roadmap.addVertex(Node(new_state))
-            nn.addPoint(new_state)
+        if points is None:
+            for i in range(samples):
+                print "getting sample "+str(i)
+                new_state = SE3.get_random_state(ground=False)
+                self.roadmap.addVertex(Node(new_state))
+                nn.addPoint(new_state)
+        else:
+            for p in points:
+                self.addToRoadmap(nn,p)
         print "Building tree"
         nn.buildTree()
         print "Adding Edges"
@@ -61,14 +69,18 @@ class PRM:
             count += 1
         return nn
 
-    def build_dense_roadmap(self, k=3, samples=100):
+    def build_dense_roadmap(self, k=3, samples=100,points = None):
         nn = nearestNeighbor()
         self.roadmap = Graph()
-        for i in range(samples):
-            print "getting sample "+str(i)
-            new_state = SE3.get_random_state()
-            self.roadmap.addVertex(Node(new_state))
-            nn.addPoint(new_state)
+        if points is None:
+            for i in range(samples):
+                print "getting sample "+str(i)
+                new_state = SE3.get_random_state(ground=False)
+                self.roadmap.addVertex(Node(new_state))
+                nn.addPoint(new_state)
+        else:
+            for p in points:
+                self.addToRoadmap(nn,p)
         print "Building tree"
         nn.buildTree()
         print "Adding Edges"
@@ -89,14 +101,18 @@ class PRM:
                 t.join()
         return nn
 
-    def build_prmstar_roadmap(self,dimensionality = 7,samples=100):
+    def build_prmstar_roadmap(self,dimensionality = 7,samples=100,points = None):
         nn = nearestNeighbor()
         self.roadmap = Graph()
-        for i in range(samples):
-            print "getting sample "+str(i)
-            new_state = SE3.get_random_state()
-            self.roadmap.addVertex(Node(new_state))
-            nn.addPoint(new_state)
+        if points is None:
+            for i in range(samples):
+                print "getting sample "+str(i)
+                new_state = SE3.get_random_state(ground=False)
+                self.roadmap.addVertex(Node(new_state))
+                nn.addPoint(new_state)
+        else:
+            for p in points:
+                self.addToRoadmap(nn,p)
         print "Building tree"
         nn.buildTree()
         print "Adding Edges"
@@ -141,10 +157,16 @@ class PRM:
                     self.roadmap.addNeighbor(node, neighbor, cost)
                     self.roadmap.addNeighbor(neighbor, node, cost)
 
+    def remove_points(self,node1,node2,nn):
+        for node in [node1, node2]:
+            point = node.data
+            self.roadmap.removeVertex(node)
+            nn.removePoint(point)
+            nn.buildTree()
 
 class DriverThread(threading.Thread):
 
-    def __init__(self,map,nn,buildtime,color,lock,xData,yData,cData,k):
+    def __init__(self,map,nn,buildtime,color,lock,xData,yData,cData,k,startGoalSamples = None):
         threading.Thread.__init__(self)
         self.map = map
         self.nn = nn
@@ -155,6 +177,7 @@ class DriverThread(threading.Thread):
         self.yData = yData
         self.cData = cData
         self.k = k
+        self.startGoalSamples = startGoalSamples
     def run(self):
         count = 0
         while count < 50:
@@ -186,23 +209,26 @@ class DriverThread(threading.Thread):
             self.cData.append(self.color)
             self.lock.release()
             count += 1
-
+            self.map.remove_points(start,goal,self.nn)
 
 if __name__ == '__main__':
-    for numsamples in [100,500]:
+    for numsamples in [25,500]:
         k = 5
         maps = [PRM(),PRM(),PRM()]
         nns = []
         buildTimes = []
 
+        randomSamples = []
+        for i in range(0,numsamples):
+            randomSamples.append(SE3.get_random_state(ground=False))
         tmp = time()
-        nns.append(maps[0].build_connected_roadmap(k,numsamples))
+        nns.append(maps[0].build_connected_roadmap(k,numsamples,points=randomSamples))
         buildTimes.append(time()-tmp)
         tmp = time()
-        nns.append(maps[1].build_dense_roadmap(k,numsamples))
+        nns.append(maps[1].build_dense_roadmap(k,numsamples,points=randomSamples))
         buildTimes.append(time() - tmp)
         tmp = time()
-        nns.append(maps[2].build_prmstar_roadmap(dimensionality=6,samples=numsamples))
+        nns.append(maps[2].build_prmstar_roadmap(dimensionality=6,samples=numsamples,points=randomSamples))
         buildTimes.append(time() - tmp)
 
         colors = ['r','g','b']
@@ -212,8 +238,13 @@ if __name__ == '__main__':
         yData = []
         cData = []
         runningthr = []
+
+        startGoalSamples = []
+        startGoalCount = 0
+
+
         for map,nn,buildtime,color in zip(maps,nns,buildTimes,colors):
-                thr = DriverThread(map,nn,buildtime,color,lock,xData,yData,cData,k=k)
+                thr = DriverThread(map,nn,buildtime,color,lock,xData,yData,cData,k=k,startGoalSamples = startGoalSamples)
                 runningthr.append(thr)
                 thr.start()
                 """
