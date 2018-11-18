@@ -50,10 +50,18 @@ class AckermannControl:
             sleep(.8)
 
     def get_new_state(self, state):
-        self.set_state(state.X, state.Y, state.theta, state.vx, state.vy, state.vs)
+        while True:
+            self.set_state(state.X, state.Y, state.theta, state.vx, state.vy, state.vs)
 
-        linVel, steerVel, time = SE2.get_random_control()
-        self.execute_control(linVel, steerVel, time=time)
+            linVel, steerVel, time = SE2.get_random_control()
+            self.execute_control(linVel, steerVel)
+            orient = self.get_model_state(model_name="ackermann_vehicle").pose.orientation
+            angles = tf.transformations.euler_from_quaternion([orient.x, orient.y, orient.z, orient.w])
+            #print angles
+            if angles[0] < 2*3.14 and angles[0] > 0:
+                break
+            else:
+                print 'redoing'
 
         new_state = self.get_model_state(model_name="ackermann_vehicle")
         new_pose, new_twist = new_state.pose, new_state.twist

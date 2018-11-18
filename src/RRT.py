@@ -40,6 +40,7 @@ class RRT:
             new_node = self.extend(q_rand)
             if SE2.distance(new_node.data, self.goal.data) < 1.5:
                 return True
+                print new_node.data
                 self.goal = new_node
                 print 'First solution', self.i
 
@@ -165,8 +166,9 @@ if __name__ == "__main__":
             break
     '''
     map.print_roadmap()
-    print map.start.neighbors
-    print map.goal.neighbors
+    print map.start, map.start.neighbors
+    print map.goal, map.goal.neighbors
+    print map.goal in map.roadmap.graph
     raw_input('Start A*?')
     path = map.roadmap.AStarPath(map.start, map.goal, h=SE2.distance)
     if path == None:
