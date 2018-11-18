@@ -31,6 +31,7 @@ class RRT:
 
     def build(self, samples=125):
         for i in range(samples):
+
             q_rand = SE2.get_random_state()
             if i % 3  == 0:
                 q_rand = SE2.get_random_state(greedy=self.greedy, goal=self.goal.data)
@@ -38,7 +39,7 @@ class RRT:
             #    q_rand = SE2.get_random_state(greedy=True, goal=self.start.data)
             #print q_rand
             new_node = self.extend(q_rand)
-            if SE2.distance(new_node.data, self.goal.data) < 1.5:
+            if SE2.distance(new_node.data, self.goal.data) < .75:
                 #print new_node.data
                 self.goal = new_node
                 #print 'First solution', self.i
@@ -61,10 +62,12 @@ class RRT:
         # chose closest control
         closest = 1
         if self.greedy:
-            closest = 1
+            closest = 4
         for i in range(closest):
             q_new = self.mouseBot.get_new_state(q_near)
             test_q = q_rand
+            if self.greedy:
+                test_q = self.goal.data
             if SE2.euclid_dist(q_new, test_q) < min_dist:
                 q_new_best = q_new
         new_node = Node(q_new_best)
@@ -82,7 +85,7 @@ class RRT:
         self.roadmap.addVertex(self.goal)
         for iter in range(10):
             q_new = self.extend(q_goal).data
-            if SE2.euclid_dist(q_new, q_goal) < 1.5:
+            if SE2.euclid_dist(q_new, q_goal) < .75:
                 self.goal = self.roadmap.graph[str(q_new)]
                 print self.i
                 return True
@@ -149,27 +152,19 @@ if __name__ == "__main__":
     mouseBot = AckermannControl()
     q_start=SE2(-8, -6.5, 3.14/2.0)
     q_goal=SE2(9, 5.5, 3*3.14/2.0)
-    samples = 150
+    samples = 400
     iter_samp = 50
     greedy = True
-    for i in range(2):
-        for i in range(50):
-            start = time()
-            map = RRT(mouseBot, q_start, q_goal, greedy=greedy)
-            while not map.build(samples=samples):
-                samples = iter_samp
+    for i in range(50):
+        start = time()
+        map = RRT(mouseBot, q_start, q_goal, greedy=greedy)
+        while not map.build(samples=samples):
+            samples = iter_samp
 
-            end = time()
-            path, cost = map.roadmap.AStarPath(map.start, map.goal, h=SE2.distance)
-            f = open('a.txt', 'ab')
-            data = "\n" + str(map.i) + "\t" + str(end-start) + "\t" + str(cost) + "\n"
-            f.write(data)
-            f.close()
-        greedy = False
-        iter_samp = 50
-        samples = 400
-        f = open('a.txt', 'ab')
-        data = "\nRRT\n"
+        end = time()
+        path, cost = map.roadmap.AStarPath(map.start, map.goal, h=SE2.distance)
+        f = open('c.txt', 'ab')
+        data = str(map.i) + "\t" + str(end-start) + "\t" + str(cost) + "\n"
         f.write(data)
         f.close()
         #print map.i, end-start
