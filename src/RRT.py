@@ -124,10 +124,9 @@ class RRT:
                 E.append([(node.data.X, node.data.Y), (n.data.X, n.data.Y)])
         fig, ax = pl.subplots()
 
-        if not astar:
-            lc = mc.LineCollection(E, color='red')
-            ax.add_collection(lc)
-            plt.scatter(Vx,Vy,color='blue')
+        lc = mc.LineCollection(E, color='red')
+        ax.add_collection(lc)
+        plt.scatter(Vx,Vy,color='orange')
 
         if astar:
             Vx_a = []
@@ -143,9 +142,9 @@ class RRT:
                     print [(s.X, s.Y), (b.X, b.Y)]
                     E_a.append([(s.X, s.Y), (b.X, b.Y)])
             #print 'PATH Edges', E_a
-            lc1 = mc.LineCollection(E_a, color='blue')
+            lc1 = mc.LineCollection(E_a, color='green', linewidth=3)
             ax.add_collection(lc1)
-            plt.scatter(Vx_a, Vy_a, color='orange')
+            plt.scatter(Vx_a, Vy_a, color='green', linewidth=3)
         fig.tight_layout()
         plt.show()
 
@@ -155,6 +154,7 @@ if __name__ == "__main__":
     mouseBot = AckermannControl()
     q_start=SE2(-8, -6.5, 3.14/2.0)
     q_goal=SE2(9, 5.5, 3*3.14/2.0)
+    #q_goal=SE2(-8, -4, 3*3.14/2.0)
     samples = 100
     greedy = True
     iter_samp = 50
@@ -193,8 +193,8 @@ if __name__ == "__main__":
         samples = iter_samp
     end = time()
     map.print_roadmap()
-    print map.start, map.start.neighbors
-    print map.goal, map.goal.neighbors
+    #print map.start, map.start.neighbors
+    #rint map.goal, map.goal.neighbors
     #print map.goal in map.roadmap.graph
     raw_input('Start A*?')
     path, cost = map.roadmap.AStarPath(map.start, map.goal, h=SE2.distance)
@@ -205,6 +205,7 @@ if __name__ == "__main__":
     map.print_roadmap(astar=True, path=path)
 
     path_s = []
+    print 'path:'
     for s in path:
         path_s.append(str(s))
     print path_s
