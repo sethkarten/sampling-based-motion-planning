@@ -34,6 +34,17 @@ class nearestNeighbor:
         self.values.append(point.unpack())
         self.pointCount += 1
 
+    def removePoint(self,point):
+        point = point.unpack()
+        for j in range(len(self.values)-1,-1,-1):
+            isSame = True
+            for k in range(0,len(self.values[j])):
+                if point[k] != self.values[j][k]:
+                    isSame = False
+                    break
+            if isSame:
+                del self.values[j]
+
     def buildTree(self):
         arr = np.array(self.values)
         if self.se2:
