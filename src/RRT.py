@@ -159,13 +159,10 @@ if __name__ == "__main__":
             #map = map1
             #map.start, map.goal = map.goal, map.start
             #break
->>>>>>> d3d663be6d15cf92c513eca9d86048c49554b9a3
         map2 = RRT.merge(map, map1)
         if map2 != None:
             map = map2
             break
-<<<<<<< HEAD
-=======
     '''
     map.print_roadmap()
     print map.start.neighbors
