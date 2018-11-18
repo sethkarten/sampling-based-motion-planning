@@ -31,9 +31,9 @@ class RRT:
 
     def build(self, samples=125):
         for i in range(samples):
-            q_rand = SE2.get_random_state(greedy=self.greedy, goal=self.goal.data)
+            q_rand = SE2.get_random_state()
             if i % 3  == 0:
-                q_rand = SE2.get_random_state()
+                q_rand = SE2.get_random_state(greedy=self.greedy, goal=self.goal.data)
             #if i % 15 == 0:
             #    q_rand = SE2.get_random_state(greedy=True, goal=self.start.data)
             #print q_rand
@@ -61,7 +61,7 @@ class RRT:
         # chose closest control
         closest = 1
         if self.greedy:
-            closest = 2
+            closest = 1
         for i in range(closest):
             q_new = self.mouseBot.get_new_state(q_near)
             test_q = q_rand
