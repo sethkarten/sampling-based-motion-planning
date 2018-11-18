@@ -110,7 +110,7 @@ class PRM:
                 k = int(math.ceil(math.e * (1 + (1.0/dimensionality))* math.log(count,2) ))
             tmp = time()
             neighbors, distances = nn.query_k_nearest(node.data, k)
-            print "nn check took ",time()-tmp,"(found ",len(neighbors)," neighbors)"
+            #print "nn check took ",time()-tmp,"(found ",len(neighbors)," neighbors)"
             tmp = time()
 
             runningthr = []
@@ -124,7 +124,7 @@ class PRM:
             count += 1
             for t in runningthr:
                 t.join()
-            print "col check took",time()-tmp
+            #print "col check took",time()-tmp
         return nn
 
 
@@ -166,8 +166,9 @@ class DriverThread(threading.Thread):
             goal = Node(SE3.get_random_state(ground=True))
             self.map.add_points(start, goal, self.nn, self.k)
             # print "Start: "+str(start), "Goal: "+str(goal)
-
+            tmp = time()
             path = self.map.roadmap.AStarPath(start, goal)
+            dt = time() - tmp
             if path == None:
                 continue
             curr = None
@@ -180,7 +181,7 @@ class DriverThread(threading.Thread):
                 curr = p
             dist += SE3.distance(curr, start.data)
             self.lock.acquire()
-            self.xData.append(self.buildtime)
+            self.xData.append(dt)#self.buildtime)
             self.yData.append(SE3.distance(start.data, goal.data) / dist)
             self.cData.append(self.color)
             self.lock.release()
@@ -188,7 +189,7 @@ class DriverThread(threading.Thread):
 
 
 if __name__ == '__main__':
-    for numsamples in range(50,100,10):
+    for numsamples in [100,500]:
         k = 5
         maps = [PRM(),PRM(),PRM()]
         nns = []
