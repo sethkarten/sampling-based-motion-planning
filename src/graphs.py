@@ -302,8 +302,7 @@ class Graph:
         while not fringe.is_empty():
             node = fringe.dequeue()
             if node.data == target.data:
-                #print dist[node.id]
-                return Graph.make_path(prev, node)
+                return Graph.make_path(prev, node), dist[node.id]
             closed[node.id] = node
             for edge in node.neighbors:
                 neighbor = edge.neighbor

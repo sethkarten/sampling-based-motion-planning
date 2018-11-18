@@ -41,7 +41,7 @@ class RRT:
             if SE2.distance(new_node.data, self.goal.data) < 1.5:
                 #print new_node.data
                 self.goal = new_node
-                print 'First solution', self.i
+                #print 'First solution', self.i
                 return True
 
             #print self.start.neighbors
@@ -76,7 +76,7 @@ class RRT:
     def connect(self):
         q_goal = self.goal.data
         self.roadmap.addVertex(self.goal)
-        for iter in range(8):
+        for iter in range(10):
             q_new = self.extend(q_goal).data
             if SE2.euclid_dist(q_new, q_goal) < 1.5:
                 self.goal = self.roadmap.graph[str(q_new)]
@@ -145,12 +145,27 @@ if __name__ == "__main__":
     mouseBot = AckermannControl()
     q_start=SE2(-8, -6.5, 3.14/2.0)
     q_goal=SE2(9, 5.5, 3*3.14/2.0)
+    samples = 150
+    iter_samp = 50
+    greedy = True
+    for i in range(2):
+        for i in range(50):
+            start = time()
+            map = RRT(mouseBot, q_start, q_goal, greedy=greedy)
+            while not map.build(samples=samples):
+                samples = iter_samp
 
-    for i in range(5):
-        start = time()
-        samples = 100
+            end = time()
+            path, cost = map.roadmap.AStarPath(map.start, map.goal, h=SE2.distance)
+            f = open('a.txt', 'ab')
+            data = str(map.i) + "\t" + str(end-start) + "\t" + str(cost) + "\n"
+            f.write(data)
+            f.close()
         greedy = False
-        map = RRT(mouseBot, q_start, q_goal, greedy=greedy)
+        iter_samp = 50
+        samples = 400
+        #print map.i, end-start
+
         '''
         map1 = RRT(mouseBot, q_goal, q_start, greedy=greedy)
 
@@ -163,18 +178,7 @@ if __name__ == "__main__":
                 break
             samples /= 2
         '''
-        while not map.build(samples=samples):
-            print "iteration"
-            samples /= 3
 
-        end = time()
-        print map.i, end-start
-        path = map.roadmap.AStarPath(map.start, map.goal, h=SE2.distance)
-    '''
-
-
-
-    '''
     #map1 = RRT(mouseBot, q_goal, q_start)
 
 
