@@ -5,7 +5,7 @@ from piano_control import PianoControl
 from time import *
 import threading
 import math
-
+import matplotlib.pyplot as plt
 def add_prm_node(a,b,roadmap,lock,cost):
     for n in a.neighbors:
         if str(n.neighbor) == str(b):
@@ -55,7 +55,7 @@ class PRM:
             for neighbor, cost in zip(neighbors, distances):
                 string_neigh = str(neighbor)
                 neighbor = self.roadmap.graph[string_neigh]
-                if self.roadmap.AStarPath(node, neighbor) is None:
+                if len(node.neighbors) == 0:
                     if add_prm_node(node,neighbor,self.roadmap,None,cost):
                         break
             count += 1
@@ -141,44 +141,93 @@ class PRM:
                     self.roadmap.addNeighbor(node, neighbor, cost)
                     self.roadmap.addNeighbor(neighbor, node, cost)
 
-if __name__ == '__main__':
-    k = 5
-    numsamples = 100
-    maps = [PRM(),PRM(),PRM()]
-    nns = []
-    nns.append(maps[0].build_connected_roadmap(k,numsamples))
-    nns.append(maps[1].build_dense_roadmap(k,numsamples))
-    nns.append(maps[2].build_prmstar_roadmap(dimensionality=6,samples=numsamples))
-    for map,nn in zip(maps,nns):
-        print "Building roadmap"
-        global TOTAL_TIME_STR
-        print getGlobalTimeStr(), "TOTAL TIME STR"
-        while True:
-            text = raw_input('Get new path? Y/N')
-            if text == 'N':
-                break
+
+class DriverThread(threading.Thread):
+
+    def __init__(self,map,nn,buildtime,color,lock,xData,yData,cData,k):
+        threading.Thread.__init__(self)
+        self.map = map
+        self.nn = nn
+        self.buildtime = buildtime
+        self.color = color
+        self.lock = lock
+        self.xData = xData
+        self.yData = yData
+        self.cData = cData
+        self.k = k
+    def run(self):
+        count = 0
+        while count < 50:
+            # text = raw_input('Get new path? Y/N')
+            # if text == 'N':
+            #    break
+            print "Sample ", count
             start = Node(SE3.get_random_state(ground=True))
             goal = Node(SE3.get_random_state(ground=True))
-            map.add_points(start, goal, nn, k)
+            self.map.add_points(start, goal, self.nn, self.k)
+            # print "Start: "+str(start), "Goal: "+str(goal)
 
-            print "Start: "+str(start), "Goal: "+str(goal)
-
-            path = map.roadmap.AStarPath(start, goal)
+            path = self.map.roadmap.AStarPath(start, goal)
             if path == None:
                 continue
-            path_s = []
-            for s in path:
-                path_s.append(str(s))
-            print path_s
+            curr = None
+            dist = 0
+            # print len(path)
+            for p in path:
+                if not curr is None:
+                    # print curr,p
+                    dist = dist + SE3.distance(curr, p)
+                curr = p
+            dist += SE3.distance(curr, start.data)
+            self.lock.acquire()
+            self.xData.append(self.buildtime)
+            self.yData.append(SE3.distance(start.data, goal.data) / dist)
+            self.cData.append(self.color)
+            self.lock.release()
+            count += 1
 
-            raw_input('Start A*?')
 
-            rocketPiano = PianoControl()
-            rocketPiano.set_position(start.data)
-            rocketPiano.set_steering_angle(start.data.q)
-            print start.data
-            for state in path:
-                sleep(.01)
-                print state
-                rocketPiano.interpolate(state)
+if __name__ == '__main__':
+    for numsamples in range(50,100,10):
+        k = 5
+        maps = [PRM(),PRM(),PRM()]
+        nns = []
+        buildTimes = []
 
+        tmp = time()
+        nns.append(maps[0].build_connected_roadmap(k,numsamples))
+        buildTimes.append(time()-tmp)
+        tmp = time()
+        nns.append(maps[1].build_dense_roadmap(k,numsamples))
+        buildTimes.append(time() - tmp)
+        tmp = time()
+        nns.append(maps[2].build_prmstar_roadmap(dimensionality=6,samples=numsamples))
+        buildTimes.append(time() - tmp)
+
+        colors = ['r','g','b']
+
+        lock = threading.Lock()
+        xData = []
+        yData = []
+        cData = []
+        runningthr = []
+        for map,nn,buildtime,color in zip(maps,nns,buildTimes,colors):
+                thr = DriverThread(map,nn,buildtime,color,lock,xData,yData,cData,k=k)
+                runningthr.append(thr)
+                thr.start()
+                """
+                raw_input('Start A*?')
+    
+                rocketPiano = PianoControl()
+                rocketPiano.set_position(start.data)
+                rocketPiano.set_steering_angle(start.data.q)
+                print start.data
+                for state in path:
+                    sleep(.01)
+                    print state
+                    rocketPiano.interpolate(state)
+                """
+        for t in runningthr:
+            t.join()
+        plt.scatter(xData,yData,c=cData)
+        plt.show()
