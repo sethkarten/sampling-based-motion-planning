@@ -45,9 +45,28 @@ class SE2:
         return sqrt((a.X - b.X)*(a.X - b.X) + (a.Y - b.Y)*(a.Y - b.Y))
 
     @staticmethod
-    def get_random_state(minX = -9, maxX = 10, minY = -7.5, maxY = 6.5):
-        x = random.uniform(minX, maxX)
-        y = random.uniform(minY, maxY)
+    def get_random_state(greedy = False, minX = -9, maxX = 10, minY = -7.5, maxY = 6.5, goal = None):
+        x = 0
+        y = 0
+        s = 0
+        if greedy:
+            sigma = 10.4
+            if goal.X > 5:
+                x = goal.X - random.gauss(0, sigma)
+            else:
+                x = goal.X + random.gauss(0, sigma)
+            if goal.Y > 5:
+                y = goal.Y - random.gauss(0, sigma)
+            else:
+                y = goal.Y - random.gauss(0, sigma)
+            x = min(x, maxX)
+            x = max(x, minX)
+            y = min(y, maxY)
+            y = max(y, minY)
+
+        else:
+            x = random.uniform(minX, maxX)
+            y = random.uniform(minY, maxY)
         s = random.uniform(0, 2*pi)
         state = SE2(x, y, s)
         return state
@@ -75,10 +94,10 @@ class SE2:
 
     @staticmethod
     def get_random_control():
-        linVelMin = -100
-        linVelMax = 100
-        steerVelMin = -10  #-244.8696
-        steerVelMax = 10   #244.8696
+        linVelMin = -200
+        linVelMax = 200
+        steerVelMin = -20  #-244.8696
+        steerVelMax = 20   #244.8696
         # sample controls
         linVel = random.uniform(linVelMin, linVelMax)
         steerVel = random.uniform(steerVelMin, steerVelMax)

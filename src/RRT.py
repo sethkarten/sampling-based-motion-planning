@@ -9,12 +9,16 @@ from matplotlib import collections as mc, pyplot as plt
 import pylab as pl
 import numpy as np
 
+
+
 class RRT:
-    def __init__(self, bot, q_start, q_goal):
+    def __init__(self, bot, q_start, q_goal, greedy=False):
         self.roadmap = Graph()
         self.mouseBot = bot
         self.nng = nearestNeighbor(se2 = True)
         self.i = 0
+
+        self.greedy = greedy
 
         q_start_node = Node(q_start)
         self.start = q_start_node
@@ -25,10 +29,19 @@ class RRT:
         self.nng.addPoint(q_start)
         self.nng.buildTree()
 
-    def build(self, samples=100):
+    def build(self, samples=125):
         for i in range(samples):
-            q_rand = SE2.get_random_state()
-            self.extend(q_rand)
+            q_rand = SE2.get_random_state(greedy=self.greedy, goal=self.goal.data)
+            if i % 3  == 0:
+                q_rand = SE2.get_random_state()
+            #if i % 15 == 0:
+            #    q_rand = SE2.get_random_state(greedy=True, goal=self.start.data)
+            #print q_rand
+            new_node = self.extend(q_rand)
+            if SE2.distance(new_node.data, self.goal.data) < 1:
+                return True
+                print 'First solution', self.i
+
             #print self.start.neighbors
             self.i+=1
             print self.i
@@ -41,7 +54,7 @@ class RRT:
         else:
             q_near = q_near[0][0]
 
-        print q_near
+        #print q_near
         min_dist = sys.maxint
         # chose closest control
         for i in range(1):
@@ -61,15 +74,12 @@ class RRT:
     def connect(self):
         q_goal = self.goal.data
         self.roadmap.addVertex(self.goal)
-        iter = 0
-        while True:
+        for iter in range(8):
             q_new = self.extend(q_goal).data
             if SE2.euclid_dist(q_new, q_goal) < 1.0:
                 self.goal = self.roadmap.graph[str(q_new)]
+                print self.i
                 return True
-            iter += 1
-            if iter > 5:
-                break
         return False
 
     @staticmethod
@@ -83,7 +93,7 @@ class RRT:
                 T1.roadmap.addNeighbor(q_new1, q_new2, cost)
                 T1.roadmap.addNeighbor(q_new2, q_new1, cost)
                 for node in T2.roadmap.graph.values():
-                    if node.data == start.data or node.data == goal.data:
+                    if node.data == T1.start.data or node.data == T1.goal.data:
                         continue
                     T1.roadmap.addVertex(node)
                 return T1
@@ -103,9 +113,10 @@ class RRT:
                 E.append([(node.data.X, node.data.Y), (n.data.X, n.data.Y)])
         fig, ax = pl.subplots()
 
-        lc = mc.LineCollection(E, color='red')
-        ax.add_collection(lc)
-        plt.scatter(Vx,Vy,color='blue')
+        if not astar:
+            lc = mc.LineCollection(E, color='red')
+            ax.add_collection(lc)
+            plt.scatter(Vx,Vy,color='blue')
 
         if astar:
             Vx_a = []
@@ -115,12 +126,12 @@ class RRT:
                 s = path[i]
                 Vx_a.append(s.X)
                 Vy_a.append(s.Y)
-                if i != len(path)-1:
+                if i < len(path)-1:
                     E.append([(s.X, s.Y), (path[i+1].X, path[i+1].Y)])
-            lc1 = mc.LineCollection(E_a, color='green', linewidths=3)
+            print E_a
+            lc1 = mc.LineCollection(E_a, color='blue')
             ax.add_collection(lc1)
-            plt.scatter(Vx_a, Vy_a, color='green', linewidths=3)
-
+            plt.scatter(Vx_a, Vy_a, color='orange')
         fig.tight_layout()
         plt.show()
 
@@ -130,19 +141,31 @@ if __name__ == "__main__":
     mouseBot = AckermannControl()
     q_start=SE2(-8, -6.5, 3.14/2.0)
     q_goal=SE2(9, 5.5, 3*3.14/2.0)
-    map = RRT(mouseBot, q_start, q_goal)
+    map = RRT(mouseBot, q_start, q_goal, greedy=True)
+
+    if not map.build(samples=300):
+        if not map.build(samples=50):
+            if not map.build(samples=20):
+                map.build(samples=50)
+    '''
     map1 = RRT(mouseBot, q_goal, q_start)
     while True:
         if map.build():
-            break
+            print 'connected0'
+            #break
         if map1.build():
-            map = map1
-            map.start, map.goal = map.goal, map.start
-            break
+            print 'connected1'
+            #map = map1
+            #map.start, map.goal = map.goal, map.start
+            #break
+>>>>>>> d3d663be6d15cf92c513eca9d86048c49554b9a3
         map2 = RRT.merge(map, map1)
         if map2 != None:
             map = map2
             break
+<<<<<<< HEAD
+=======
+    '''
     map.print_roadmap()
     print map.start.neighbors
     print map.goal.neighbors
@@ -161,4 +184,4 @@ if __name__ == "__main__":
     for q in path:
         print q
         mouseBot.set_state(q.X, q.Y, q.theta, vx=q.vx, vy=q.vy, vs=q.vs)
-        sleep(1)
+        sleep(.4)

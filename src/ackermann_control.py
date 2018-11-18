@@ -70,6 +70,10 @@ class AckermannControl:
 
         return SE2(x,y,s)
 
+    def interpolate(self, state):
+        '''Create smooth transition graphic to impress myself'''
+        model_state_resp = self.get_model_state(model_name="ackermann_vehicle")
+
 
 if __name__ == "__main__":
     mouseBot = AckermannControl()
