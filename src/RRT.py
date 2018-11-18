@@ -137,12 +137,12 @@ class RRT:
                 s = path[i]
                 Vx_a.append(s.X)
                 Vy_a.append(s.Y)
-                print i < len(path)-1
+                #print i < len(path)-1
                 if i < len(path)-1:
                     b = path[i+1]
                     print [(s.X, s.Y), (b.X, b.Y)]
                     E_a.append([(s.X, s.Y), (b.X, b.Y)])
-            print 'PATH Edges', E_a
+            #print 'PATH Edges', E_a
             lc1 = mc.LineCollection(E_a, color='blue')
             ax.add_collection(lc1)
             plt.scatter(Vx_a, Vy_a, color='orange')
