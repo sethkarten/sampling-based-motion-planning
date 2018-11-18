@@ -32,7 +32,7 @@ class RRT:
     def build(self, samples=125):
         for i in range(samples):
             q_rand = SE2.get_random_state(greedy=self.greedy, goal=self.goal.data)
-            if i % 5  == 0:
+            if i % 3  == 0:
                 q_rand = SE2.get_random_state()
             #if i % 15 == 0:
             #    q_rand = SE2.get_random_state(greedy=True, goal=self.start.data)
@@ -59,9 +59,13 @@ class RRT:
         #print q_near
         min_dist = sys.maxint
         # chose closest control
-        for i in range(1):
+        closest = 1
+        if self.greedy:
+            closest = 2
+        for i in range(closest):
             q_new = self.mouseBot.get_new_state(q_near)
-            if SE2.euclid_dist(q_new, q_rand) < min_dist:
+            test_q = q_rand
+            if SE2.euclid_dist(q_new, test_q) < min_dist:
                 q_new_best = q_new
         new_node = Node(q_new_best)
         self.roadmap.addVertex(new_node)
@@ -158,12 +162,16 @@ if __name__ == "__main__":
             end = time()
             path, cost = map.roadmap.AStarPath(map.start, map.goal, h=SE2.distance)
             f = open('a.txt', 'ab')
-            data = str(map.i) + "\t" + str(end-start) + "\t" + str(cost) + "\n"
+            data = "\n" + str(map.i) + "\t" + str(end-start) + "\t" + str(cost) + "\n"
             f.write(data)
             f.close()
         greedy = False
         iter_samp = 50
         samples = 400
+        f = open('a.txt', 'ab')
+        data = "\nRRT\n"
+        f.write(data)
+        f.close()
         #print map.i, end-start
 
         '''

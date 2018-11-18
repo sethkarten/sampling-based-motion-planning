@@ -94,8 +94,8 @@ class SE2:
 
     @staticmethod
     def get_random_control():
-        linVelMin = -15
-        linVelMax = 15
+        linVelMin = -30
+        linVelMax = 30
         steerVelMin = -5  #-244.8696
         steerVelMax = 5   #244.8696
         # sample controls
