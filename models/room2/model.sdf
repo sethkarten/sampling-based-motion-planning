@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="room2">
+    <static>true</static>
+    <link name="link">
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!--scale>0.0254 0.0254 0.0254</scale-->
+            <uri>model://room2/meshes/room2.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://room2/meshes/room2.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <pose frame=''>0 0 0 0 -0 0</pose>
+  </model>
+</sdf>
