@@ -39,7 +39,7 @@ class RRT:
             #    q_rand = SE2.get_random_state(greedy=True, goal=self.start.data)
             #print q_rand
             new_node = self.extend(q_rand)
-            if SE2.distance(new_node.data, self.goal.data) < .75:
+            if SE2.distance(new_node.data, self.goal.data) < 1.5:
                 #print new_node.data
                 self.goal = new_node
                 #print 'First solution', self.i
@@ -47,7 +47,7 @@ class RRT:
 
             #print self.start.neighbors
             self.i+=1
-            #print self.i
+            print self.i
         return self.connect()
 
     def extend(self, q_rand):
@@ -62,7 +62,7 @@ class RRT:
         # chose closest control
         closest = 1
         if self.greedy:
-            closest = 4
+            closest = 2
         for i in range(closest):
             q_new = self.mouseBot.get_new_state(q_near)
             test_q = q_rand
@@ -85,7 +85,7 @@ class RRT:
         self.roadmap.addVertex(self.goal)
         for iter in range(10):
             q_new = self.extend(q_goal).data
-            if SE2.euclid_dist(q_new, q_goal) < .75:
+            if SE2.euclid_dist(q_new, q_goal) < 1.5:
                 self.goal = self.roadmap.graph[str(q_new)]
                 print self.i
                 return True
@@ -137,9 +137,12 @@ class RRT:
                 s = path[i]
                 Vx_a.append(s.X)
                 Vy_a.append(s.Y)
+                print i < len(path)-1
                 if i < len(path)-1:
-                    E.append([(s.X, s.Y), (path[i+1].X, path[i+1].Y)])
-            print E_a
+                    b = path[i+1]
+                    print [(s.X, s.Y), (b.X, b.Y)]
+                    E_a.append([(s.X, s.Y), (b.X, b.Y)])
+            print 'PATH Edges', E_a
             lc1 = mc.LineCollection(E_a, color='blue')
             ax.add_collection(lc1)
             plt.scatter(Vx_a, Vy_a, color='orange')
@@ -152,9 +155,10 @@ if __name__ == "__main__":
     mouseBot = AckermannControl()
     q_start=SE2(-8, -6.5, 3.14/2.0)
     q_goal=SE2(9, 5.5, 3*3.14/2.0)
-    samples = 400
-    iter_samp = 50
+    samples = 100
     greedy = True
+    iter_samp = 50
+    '''
     for i in range(50):
         start = time()
         map = RRT(mouseBot, q_start, q_goal, greedy=greedy)
@@ -169,7 +173,7 @@ if __name__ == "__main__":
         f.close()
         #print map.i, end-start
 
-        '''
+
         map1 = RRT(mouseBot, q_goal, q_start, greedy=greedy)
 
         while True:
@@ -180,17 +184,21 @@ if __name__ == "__main__":
                 map = map2
                 break
             samples /= 2
-        '''
+    '''
 
     #map1 = RRT(mouseBot, q_goal, q_start)
-
-
+    start = time()
+    map = RRT(mouseBot, q_start, q_goal, greedy=greedy)
+    while not map.build(samples=samples):
+        samples = iter_samp
+    end = time()
     map.print_roadmap()
     print map.start, map.start.neighbors
     print map.goal, map.goal.neighbors
-    print map.goal in map.roadmap.graph
+    #print map.goal in map.roadmap.graph
     raw_input('Start A*?')
-    path = map.roadmap.AStarPath(map.start, map.goal, h=SE2.distance)
+    path, cost = map.roadmap.AStarPath(map.start, map.goal, h=SE2.distance)
+    print 'cost:\t' + str(cost)
     if path == None:
         print None
     path.insert(0, map.start.data)
