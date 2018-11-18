@@ -29,6 +29,10 @@ class nearestNeighbor:
         self.metric = metric
         self.repack = repack
         self.se2 = se2
+        if (self.se2):
+            self.metric = se2DistFunc
+            self.repack = SE2.repack
+
 
     def addPoint(self,point):
         self.values.append(point.unpack())

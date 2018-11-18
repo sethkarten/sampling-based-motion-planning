@@ -63,7 +63,7 @@ class PRM:
             for neighbor, cost in zip(neighbors, distances):
                 string_neigh = str(neighbor)
                 neighbor = self.roadmap.graph[string_neigh]
-                if len(node.neighbors) == 0:
+                if self.map.roadmap.AStarPath(node, neighbor):
                     if add_prm_node(node,neighbor,self.roadmap,None,cost):
                         break
             count += 1
