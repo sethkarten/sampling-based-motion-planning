@@ -47,7 +47,7 @@ class AckermannControl:
             msg.steering_angle_velocity = ang_v
             self.ctrl.publish(msg)
             time -= 1
-            sleep(.8)
+            sleep(1)
 
     def get_new_state(self, state):
         while True:
@@ -60,8 +60,10 @@ class AckermannControl:
             #print angles
             if angles[0] < 2*3.14 and angles[0] > 0:
                 break
+            '''
             else:
                 print 'redoing'
+            '''
 
         new_state = self.get_model_state(model_name="ackermann_vehicle")
         new_pose, new_twist = new_state.pose, new_state.twist

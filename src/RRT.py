@@ -2,7 +2,7 @@
 from graphs import *
 from nn import nearestNeighbor
 from ackermann_control import AckermannControl
-from time import sleep
+from time import *
 import sys, random
 
 from matplotlib import collections as mc, pyplot as plt
@@ -39,18 +39,18 @@ class RRT:
             #print q_rand
             new_node = self.extend(q_rand)
             if SE2.distance(new_node.data, self.goal.data) < 1.5:
-                return True
-                print new_node.data
+                #print new_node.data
                 self.goal = new_node
                 print 'First solution', self.i
+                return True
 
             #print self.start.neighbors
             self.i+=1
-            print self.i
+            #print self.i
         return self.connect()
 
     def extend(self, q_rand):
-        q_near = self.nng.query_k_nearest(q_rand, 5)
+        q_near = self.nng.query_k_nearest(q_rand, 1)
         if len(q_near) == 5:
             q_near = q_near[random.randint(0,4)][0][0]
         else:
@@ -78,26 +78,28 @@ class RRT:
         self.roadmap.addVertex(self.goal)
         for iter in range(8):
             q_new = self.extend(q_goal).data
-            if SE2.euclid_dist(q_new, q_goal) < 1.0:
+            if SE2.euclid_dist(q_new, q_goal) < 1.5:
                 self.goal = self.roadmap.graph[str(q_new)]
                 print self.i
                 return True
         return False
 
     @staticmethod
-    def merge(T1, T2, attempts=30):
+    def merge(T1, T2, attempts=15):
         for i in range(attempts):
-            q_rand = SE2.get_random_state()
+            q_rand = SE2.get_random_state(greedy=True, goal=SE2(0,0,0))
             q_new1 = T1.extend(q_rand)
             q_new2 = T2.extend(q_new1.data)
             cost = SE2.distance(q_new1.data, q_new2.data)
-            if cost < 0.5:
+            T1.i += 2
+            if cost < 0.8:
                 T1.roadmap.addNeighbor(q_new1, q_new2, cost)
                 T1.roadmap.addNeighbor(q_new2, q_new1, cost)
                 for node in T2.roadmap.graph.values():
                     if node.data == T1.start.data or node.data == T1.goal.data:
                         continue
                     T1.roadmap.addVertex(node)
+                T1.i += T2.i
                 return T1
             else:
                 T1, T2 = T2, T1
@@ -143,28 +145,39 @@ if __name__ == "__main__":
     mouseBot = AckermannControl()
     q_start=SE2(-8, -6.5, 3.14/2.0)
     q_goal=SE2(9, 5.5, 3*3.14/2.0)
-    map = RRT(mouseBot, q_start, q_goal, greedy=True)
 
-    if not map.build(samples=300):
-        if not map.build(samples=50):
-            if not map.build(samples=20):
-                map.build(samples=50)
+    for i in range(5):
+        start = time()
+        samples = 100
+        greedy = False
+        map = RRT(mouseBot, q_start, q_goal, greedy=greedy)
+        '''
+        map1 = RRT(mouseBot, q_goal, q_start, greedy=greedy)
+
+        while True:
+            map.build(samples=samples)
+            map1.build(samples=samples)
+            map2 = RRT.merge(map, map1)
+            if map2 != None:
+                map = map2
+                break
+            samples /= 2
+        '''
+        while not map.build(samples=samples):
+            print "iteration"
+            samples /= 3
+
+        end = time()
+        print map.i, end-start
+        path = map.roadmap.AStarPath(map.start, map.goal, h=SE2.distance)
     '''
-    map1 = RRT(mouseBot, q_goal, q_start)
-    while True:
-        if map.build():
-            print 'connected0'
-            #break
-        if map1.build():
-            print 'connected1'
-            #map = map1
-            #map.start, map.goal = map.goal, map.start
-            #break
-        map2 = RRT.merge(map, map1)
-        if map2 != None:
-            map = map2
-            break
+
+
+
     '''
+    #map1 = RRT(mouseBot, q_goal, q_start)
+
+
     map.print_roadmap()
     print map.start, map.start.neighbors
     print map.goal, map.goal.neighbors

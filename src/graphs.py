@@ -94,10 +94,10 @@ class SE2:
 
     @staticmethod
     def get_random_control():
-        linVelMin = -200
-        linVelMax = 200
-        steerVelMin = -20  #-244.8696
-        steerVelMax = 20   #244.8696
+        linVelMin = -15
+        linVelMax = 15
+        steerVelMin = -5  #-244.8696
+        steerVelMax = 5   #244.8696
         # sample controls
         linVel = random.uniform(linVelMin, linVelMax)
         steerVel = random.uniform(steerVelMin, steerVelMax)
@@ -249,6 +249,7 @@ class Node:
         TOTAL_TIME_STR += time() - tmp
         return dat
 
+
 class Edge:
     def __init__(self, neighbor, cost):
         self.neighbor = neighbor
@@ -291,6 +292,7 @@ class Graph:
         while not fringe.is_empty():
             node = fringe.dequeue()
             if node.data == target.data:
+                print dist[node.id]
                 return Graph.make_path(prev, node)
             closed[node.id] = node
             for edge in node.neighbors:
